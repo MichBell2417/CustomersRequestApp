@@ -137,6 +137,7 @@ class FirstScreen extends StatelessWidget {
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
                                     radioButtonSelection = value!;
+                                    customersController.serviceInShop=false;
                                   }),
                             ),
                             Expanded(
@@ -146,6 +147,7 @@ class FirstScreen extends StatelessWidget {
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
                                     radioButtonSelection = value!;
+                                    customersController.serviceInShop=true;
                                   }),
                             ),
                           ],
@@ -177,7 +179,13 @@ class FirstScreen extends StatelessWidget {
                                 Text("Fin: ${customersController.endTime}")
                               ],
                             )),
-                            Expanded(child: Column(children: [Text("horas de trabajo reales: ${customersController.workHoursString()}"), Text("horas de trabajo contadas: ${customersController.workHoursStringContadas()}")]))
+                            Expanded(
+                                child: Column(children: [
+                              Text(
+                                  "horas de trabajo reales: ${customersController.workHoursString()}"),
+                              Text(
+                                  "horas de trabajo contadas: ${customersController.workHoursStringContadas()}")
+                            ]))
                           ],
                         )
                       ],
