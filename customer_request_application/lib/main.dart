@@ -10,7 +10,7 @@ class PrincipalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => applicationController(),
+      create: (context) => ApplicationController(),
       child: MaterialApp(
         home: FirstScreen(),
       ),
@@ -33,7 +33,7 @@ class FirstScreen extends StatelessWidget {
   SingingCharacter? radioButtonSelection;
   @override
   Widget build(BuildContext context) {
-    var customersController = context.watch<applicationController>();
+    var customersController = context.watch<ApplicationController>();
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,

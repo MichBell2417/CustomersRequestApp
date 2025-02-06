@@ -15,7 +15,7 @@ class Customer{
   }
 }
 
-class applicationController extends ChangeNotifier{
+class ApplicationController extends ChangeNotifier{
   //TODO: the data customer will be archived in csv file and the process will be automated
   List<Customer> customers = [Customer("Marco", "xx@gmail.com", 3333333333, "via, Marco Ruspi", 3, "10h"), Customer("Luca", "luce@gmail.com", 334555555, "via, Lucio Armando", 15, "20h")];
 
