@@ -112,7 +112,20 @@ class FirstScreen extends StatelessWidget {
                             Expanded(
                               child: ElevatedButton(
                                   onPressed: () {
-                                    print("ricerca persona");
+                                    if (customersController.findNumberCustomer(
+                                        customerNumberController.text)) {
+                                      nombreController.text =
+                                          customersController.customer!.name;
+                                      emailController.text =
+                                          customersController.customer!.eMail;
+                                      numeroDeTelefonoController.text =
+                                          customersController
+                                              .customer!.phoneNumber
+                                              .toString();
+                                    } else {
+                                      customerNumberController.text =
+                                          "Error con cliente";
+                                    }
                                   },
                                   child: Text("search")),
                             )
@@ -122,8 +135,12 @@ class FirstScreen extends StatelessWidget {
                           padding: EdgeInsets.all(10),
                           child: Row(
                             children: [
-                              Expanded(child: Text("tipo de contrato: ")),
-                              Expanded(child: Text("horas restantes: ")),
+                              Expanded(
+                                  child: Text(
+                                      "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType : ""}")),
+                              Expanded(
+                                  child: Text(
+                                      "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}")),
                             ],
                           ),
                         ),
@@ -137,7 +154,7 @@ class FirstScreen extends StatelessWidget {
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
                                     radioButtonSelection = value!;
-                                    customersController.serviceInShop=false;
+                                    customersController.serviceInShop(false);
                                   }),
                             ),
                             Expanded(
@@ -147,7 +164,7 @@ class FirstScreen extends StatelessWidget {
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
                                     radioButtonSelection = value!;
-                                    customersController.serviceInShop=true;
+                                    customersController.serviceInShop(true);
                                   }),
                             ),
                           ],
@@ -186,6 +203,18 @@ class FirstScreen extends StatelessWidget {
                               Text(
                                   "horas de trabajo contadas: ${customersController.workHoursStringContadas()}")
                             ]))
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(child: ElevatedButton(onPressed: (){
+                              if(customersController.customer!=null){
+                                customersController.removeHours();
+                              }else{
+                                customerNumberController.text="introduzca un número de cliente";
+                              }
+                            }, child: Text("Save"))),
+                            Expanded(child: ElevatedButton(onPressed: (){}, child: Text("View Data"))),
                           ],
                         )
                       ],
