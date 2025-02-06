@@ -17,8 +17,10 @@ class PrincipalPage extends StatelessWidget {
     );
   }
 }
+
 //
 enum SingingCharacter { casa, tienda }
+
 //Here you write the interface
 class FirstScreen extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
@@ -26,6 +28,8 @@ class FirstScreen extends StatelessWidget {
   final numeroDeTelefonoController = TextEditingController();
   final emailController = TextEditingController();
   final customerNumberController = TextEditingController();
+  final startTimeController = TextEditingController();
+  final endTimeController = TextEditingController();
   SingingCharacter? radioButtonSelection;
   @override
   Widget build(BuildContext context) {
@@ -35,118 +39,152 @@ class FirstScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           title: Text('Control del cliente'),
         ),
-        body: Column(
-          children: [
-            Expanded(
-                child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 2)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    "Informationes de cliente",
-                    style: sectionTitle,
-                  ),
-                  Row(children: [
-                    Text("nombre: "),
-                    Expanded(
-                      child: TextFormField(
-                        controller: nombreController,
-                      ),
-                    ),
-                  ]),
-                  Row(children: [
-                    Text("número telefónico: "),
-                    Expanded(
-                      child: TextFormField(
-                        controller: numeroDeTelefonoController,
-                      ),
-                    ),
-                  ]),
-                  Row(children: [
-                    Text("e-Mail: "),
-                    Expanded(
-                      child: TextFormField(
-                        controller: emailController,
-                      ),
-                    ),
-                  ]),
-                  ElevatedButton(
-                      onPressed: () {
-                        print("salvataggio cliente");
-                      },
-                      child: Text("SAVE"))
-                ],
-              ),
-            )),
-            Expanded(
-                child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 2)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    "contrato de cliente",
-                    style: sectionTitle,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(child: Text("Número de cliente")),
-                      Expanded(
-                        flex: 2,
-                        child: TextFormField(
-                          controller: customerNumberController,
-                        ),
-                      ),
-                      Expanded(
-                        child: ElevatedButton(
-                            onPressed: () {
-                              print("ricerca persona");
-                            },
-                            child: Text("search")),
-                      )
-                    ],
-                  ),
-                  Container(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                  height: 400,
+                  child: Container(
                     padding: EdgeInsets.all(10),
-                    child: Row(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 2)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(child: Text("tipo de contrato: ")),
-                        Expanded(child: Text("horas restantes: ")),
+                        Text(
+                          "Informationes de cliente",
+                          style: sectionTitle,
+                        ),
+                        Row(children: [
+                          Text("nombre: "),
+                          Expanded(
+                            child: TextFormField(
+                              controller: nombreController,
+                            ),
+                          ),
+                        ]),
+                        Row(children: [
+                          Text("número telefónico: "),
+                          Expanded(
+                            child: TextFormField(
+                              controller: numeroDeTelefonoController,
+                            ),
+                          ),
+                        ]),
+                        Row(children: [
+                          Text("e-Mail: "),
+                          Expanded(
+                            child: TextFormField(
+                              controller: emailController,
+                            ),
+                          ),
+                        ]),
+                        ElevatedButton(
+                            onPressed: () {
+                              print("salvataggio cliente");
+                            },
+                            child: Text("SAVE"))
                       ],
                     ),
-                  ),
-                  Text("tipo de asistencia"),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile(
-                          title: Text("En casa del cliente"),
-                            value: SingingCharacter.casa,
-                            groupValue: radioButtonSelection,
-                            onChanged: (SingingCharacter? value) {
-                              radioButtonSelection = value!;
-                            }),
-                      ),
-                      Expanded(
-                        child: RadioListTile(
-                          title: Text("En la tienda"),
-                            value: SingingCharacter.tienda,
-                            groupValue: radioButtonSelection,
-                            onChanged: (SingingCharacter? value) {
-                              radioButtonSelection = value!;
-                            }),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ))
-          ],
+                  )),
+              Container(
+                  height: 400,
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 2)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          "contrato de cliente",
+                          style: sectionTitle,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(child: Text("Número de cliente")),
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                controller: customerNumberController,
+                              ),
+                            ),
+                            Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    print("ricerca persona");
+                                  },
+                                  child: Text("search")),
+                            )
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            children: [
+                              Expanded(child: Text("tipo de contrato: ")),
+                              Expanded(child: Text("horas restantes: ")),
+                            ],
+                          ),
+                        ),
+                        Text("tipo de asistencia"),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile(
+                                  title: Text("En casa del cliente"),
+                                  value: SingingCharacter.casa,
+                                  groupValue: radioButtonSelection,
+                                  onChanged: (SingingCharacter? value) {
+                                    radioButtonSelection = value!;
+                                  }),
+                            ),
+                            Expanded(
+                              child: RadioListTile(
+                                  title: Text("En la tienda"),
+                                  value: SingingCharacter.tienda,
+                                  groupValue: radioButtonSelection,
+                                  onChanged: (SingingCharacter? value) {
+                                    radioButtonSelection = value!;
+                                  }),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                                child: Column(
+                              children: [
+                                ElevatedButton(
+                                    onPressed: () {
+                                      customersController.selectTime(
+                                          context, true);
+                                    },
+                                    child: Text("Hora de inicio")),
+                                Text("Inicio: ${customersController.startTime}")
+                              ],
+                            )),
+                            Expanded(
+                                child: Column(
+                              children: [
+                                ElevatedButton(
+                                    onPressed: () {
+                                      customersController.selectTime(
+                                          context, false);
+                                    },
+                                    child: Text("Hora de fin")),
+                                Text("Fin: ${customersController.endTime}")
+                              ],
+                            )),
+                            Expanded(child: Column(children: [Text("horas de trabajo reales: ${customersController.workHoursString()}"), Text("horas de trabajo contadas: ${customersController.workHoursStringContadas()}")]))
+                          ],
+                        )
+                      ],
+                    ),
+                  ))
+            ],
+          ),
         ));
   }
 }
