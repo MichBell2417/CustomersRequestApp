@@ -3,9 +3,9 @@ import "package:flutter/material.dart";
 class Customer{
   String _name;
   String? _eMail;
-  int _phoneNumber;
+  String _phoneNumber;
   String _street; //where the customer live
-  String _contractType; //the type of contract the customers bougth
+  ContractType _contractType; //the type of contract the customers bougth
   TimeOfDay _remainingContractTime; //time left
   Customer(this._name, String eMail, this._phoneNumber, this._street, this._remainingContractTime, this._contractType){
     if(!eMail.contains('@')){
@@ -20,18 +20,106 @@ class Customer{
   get street => _street;
   get contractType => _contractType;
   get remainingContractTime => _remainingContractTime;
+
+  void setName(String name) {
+    _name = name;
+  }
+
+  void setEmail(String? eMail) {
+    _eMail = eMail;
+  }
+
+  void setPhoneNumber(String phoneNumber) {
+    _phoneNumber = phoneNumber;
+  }
+
+  void setStreet(String street) {
+    _street = street;
+  }
+
+  void setContractType(ContractType contractType) {
+    _contractType = contractType;
+  }
+
   String remainingContractTimeStr(){
     return ApplicationController.timeInString(_remainingContractTime.hour, _remainingContractTime.minute);
   }
 }
 
+class ContractType {
+  String _name;
+  TimeOfDay _time;
+  ContractType(this._name, this._time);
+  void setName(String name) {
+    _name = name;
+  }
+  void setTime(TimeOfDay time) {
+    _time = time;
+  }
+  String get name => _name;
+  TimeOfDay get time => _time;
+}
+
 class ApplicationController extends ChangeNotifier{
   Customer? customer;
+
+  final List<ContractType> contractTypes = <ContractType>[
+    ContractType("decima",TimeOfDay(hour: 20, minute: 0)),
+    ContractType("secunda",TimeOfDay(hour: 15, minute: 0)),
+    ContractType("terza",TimeOfDay(hour: 10, minute: 0)),
+    ContractType("quarta",TimeOfDay(hour: 5, minute: 0))
+  ];
   //TODO: the data customer will be archived in csv file and the process will be automated
   List<Customer> customers = [
-    Customer("Marco", "xx@gmail.com", 3333333333, "via, Marco Ruspi", TimeOfDay(hour: 3, minute: 0), "10h"), 
-    Customer("Luca", "luce@gmail.com", 334555555, "via, Lucio Armando", TimeOfDay(hour: 15, minute: 0), "20h")
+    Customer("Marco", "xx@gmail.com", "3333333333", "via, Marco Ruspi", TimeOfDay(hour: 10, minute: 0),ContractType("decima",TimeOfDay(hour: 20, minute: 0)),), 
+    //Customer("Luca", "luce@gmail.com", "334555555", "via, Lucio Armando", TimeOfDay(hour: 15, minute: 0), "20h"),
     ];
+  String selectedContract="";
+  bool upgradeData(int index, String name, String eMail, String phoneNumber, String street){
+    try {
+      customers[index].setName(name);
+      customers[index].setEmail(eMail);
+      customers[index].setPhoneNumber(phoneNumber);
+      customers[index].setStreet(street);
+      return true;
+    } catch (e) {
+      return false;
+    }
+       
+  }
+  bool addCustomer(String name, String eMail, String phoneNumber, String street){
+    ContractType? contract;
+    if(selectedContract!=""){
+      for(int i=0; i<contractTypes.length; i++){
+        if(selectedContract==contractTypes[i].name){
+          contract=contractTypes[i];
+          break;
+        }
+      }
+      if(contract!=null){
+        customers.add(Customer(name, eMail, phoneNumber, street, contract.time, contract));
+        return true;
+      }
+    }
+    return false;
+  }
+//--------------------------------------------------------- control the alert parts
+  void alert(BuildContext context, String title, String description){
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(title),
+        content: Text(description),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
 //--------------------------------------------------------- part to find the customer from his number
   //the customer number is the corresponding index in the vector "customers"
   bool findNumberCustomer(String indexStr){
@@ -47,6 +135,8 @@ class ApplicationController extends ChangeNotifier{
     }catch(e){
       print("error insert a number");
     }
+    customer=null;
+    notifyListeners();
     return false;
   }
 //--------------------------------------------------------- part to edit the hours remain
@@ -56,7 +146,7 @@ class ApplicationController extends ChangeNotifier{
     int hours=remainingTime.hour-timeToRemove.hour;
     int minutes=remainingTime.minute-timeToRemove.minute;
     if(hours<0){
-      hours=24+hours;
+      hours=0;
     }
     if(minutes<0){
       if(hours>0){

@@ -30,10 +30,28 @@ class FirstScreen extends StatelessWidget {
   final customerNumberController = TextEditingController();
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
+  final streetController = TextEditingController();
   SingingCharacter? radioButtonSelection;
+
   @override
   Widget build(BuildContext context) {
     var customersController = context.watch<ApplicationController>();
+    Widget graphicPartContract = Row(children: [
+      Expanded(child: Text("seleccione un tipo de contrato: ")),
+      Expanded(
+        child: DropdownMenu<String>(
+          initialSelection: customersController.contractTypes.first.name,
+          onSelected: (String? value) {
+            customersController.selectedContract = value!;
+          },
+          dropdownMenuEntries: customersController.contractTypes
+              .map<DropdownMenuEntry<String>>((ContractType value) {
+            return DropdownMenuEntry<String>(
+                value: value.name, label: value.name);
+          }).toList(),
+        ),
+      ),
+    ]);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -43,11 +61,13 @@ class FirstScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                  height: 400,
+                  color: Colors.amber,
+                  height: 350,
                   child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 2)),
+                      border: Border.all(color: Colors.grey, width: 2),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -79,11 +99,53 @@ class FirstScreen extends StatelessWidget {
                             ),
                           ),
                         ]),
+                        Row(children: [
+                          Text("Calle: "),
+                          Expanded(
+                            child: TextFormField(
+                              controller: streetController,
+                            ),
+                          ),
+                        ]),
+                        Container(child: customersController.customer == null ? graphicPartContract : null),
                         ElevatedButton(
                             onPressed: () {
-                              print("salvataggio cliente");
+                              if (customersController.customer != null) {
+                                if (!customersController.upgradeData(
+                                    int.parse(customerNumberController.text),
+                                    nombreController.text,
+                                    emailController.text,
+                                    numeroDeTelefonoController.text,
+                                    streetController.text)) {
+                                  customersController.alert(
+                                      context, "Error", "Not upgraded");
+                                } else {
+                                  customersController.alert(context, "Upgraded",
+                                      "The customer has been upgraded");
+                                }
+                              } else {
+                                if (customersController.addCustomer(
+                                    nombreController.text,
+                                    emailController.text,
+                                    numeroDeTelefonoController.text,
+                                    streetController.text)) {
+                                  nombreController.text = "";
+                                  emailController.text = "";
+                                  numeroDeTelefonoController.text = "";
+                                  streetController.text = "";
+                                  customersController.alert(context, "Saved",
+                                      "the customer has been saved");
+                                } else {
+                                  customersController.alert(
+                                      context,
+                                      "Not saved",
+                                      "the customer hasn't been saved");
+                                }
+                              }
                             },
-                            child: Text("SAVE"))
+                            child: Text(customersController.customer != null
+                                ? "UPGRADE"
+                                : "SAVE")),
                       ],
                     ),
                   )),
@@ -120,11 +182,18 @@ class FirstScreen extends StatelessWidget {
                                           customersController.customer!.eMail;
                                       numeroDeTelefonoController.text =
                                           customersController
-                                              .customer!.phoneNumber
-                                              .toString();
+                                              .customer!.phoneNumber;
+                                      streetController.text =
+                                          customersController.customer!.street;
                                     } else {
-                                      customerNumberController.text =
-                                          "Error con cliente";
+                                      customersController.alert(
+                                          context,
+                                          "Error",
+                                          "The customer doesn't exist.");
+                                      nombreController.text = "";
+                                      emailController.text = "";
+                                      numeroDeTelefonoController.text = "";
+                                      streetController.text = "";
                                     }
                                   },
                                   child: Text("search")),
@@ -137,7 +206,7 @@ class FirstScreen extends StatelessWidget {
                             children: [
                               Expanded(
                                   child: Text(
-                                      "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType : ""}")),
+                                      "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType.name : ""}")),
                               Expanded(
                                   child: Text(
                                       "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}")),
@@ -207,14 +276,24 @@ class FirstScreen extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Expanded(child: ElevatedButton(onPressed: (){
-                              if(customersController.customer!=null){
-                                customersController.removeHours();
-                              }else{
-                                customerNumberController.text="introduzca un número de cliente";
-                              }
-                            }, child: Text("Save"))),
-                            Expanded(child: ElevatedButton(onPressed: (){}, child: Text("View Data"))),
+                            Expanded(
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      if (customersController.customer !=
+                                          null) {
+                                        customersController.removeHours();
+                                      } else {
+                                        customersController.alert(
+                                            context,
+                                            "Error",
+                                            "introduzca un numero de cliente");
+                                      }
+                                    },
+                                    child: Text("Save"))),
+                            Expanded(
+                                child: ElevatedButton(
+                                    onPressed: () {},
+                                    child: Text("View Data"))),
                           ],
                         )
                       ],
