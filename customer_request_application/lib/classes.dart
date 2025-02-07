@@ -28,7 +28,10 @@ class Customer{
 class ApplicationController extends ChangeNotifier{
   Customer? customer;
   //TODO: the data customer will be archived in csv file and the process will be automated
-  List<Customer> customers = [Customer("Marco", "xx@gmail.com", 3333333333, "via, Marco Ruspi", TimeOfDay(hour: 3, minute: 0), "10h"), Customer("Luca", "luce@gmail.com", 334555555, "via, Lucio Armando", TimeOfDay(hour: 15, minute: 0), "20h")];
+  List<Customer> customers = [
+    Customer("Marco", "xx@gmail.com", 3333333333, "via, Marco Ruspi", TimeOfDay(hour: 3, minute: 0), "10h"), 
+    Customer("Luca", "luce@gmail.com", 334555555, "via, Lucio Armando", TimeOfDay(hour: 15, minute: 0), "20h")
+    ];
 //--------------------------------------------------------- part to find the customer from his number
   //the customer number is the corresponding index in the vector "customers"
   bool findNumberCustomer(String indexStr){
@@ -143,6 +146,10 @@ class ApplicationController extends ChangeNotifier{
         if(time.minute%30!=0){
           minute=30*(minute~/30)+30;
         }
+      }
+      if(minute==60){
+        hour+=1;
+        minute=0;
       }
       return timeInString(hour, minute);
     }else{
