@@ -7,13 +7,7 @@ class Customer{
   String _street; //where the customer live
   ContractType _contractType; //the type of contract the customers bougth
   TimeOfDay _remainingContractTime; //time left
-  Customer(this._name, String eMail, this._phoneNumber, this._street, this._remainingContractTime, this._contractType){
-    if(!eMail.contains('@')){
-      print("Email error");
-    }else{
-      _eMail=eMail;
-    }
-  }
+  Customer(this._name, this._eMail, this._phoneNumber, this._street, this._remainingContractTime, this._contractType);
   get eMail => _eMail;
   get name => _name;
   get phoneNumber => _phoneNumber;
@@ -76,6 +70,9 @@ class ApplicationController extends ChangeNotifier{
     ];
   String selectedContract="";
   bool upgradeData(int index, String name, String eMail, String phoneNumber, String street){
+    if(!eMail.contains('@')){
+      return false;
+    }
     try {
       customers[index].setName(name);
       customers[index].setEmail(eMail);
@@ -96,7 +93,7 @@ class ApplicationController extends ChangeNotifier{
           break;
         }
       }
-      if(contract!=null){
+      if(contract!=null && eMail.contains('@')){
         customers.add(Customer(name, eMail, phoneNumber, street, contract.time, contract));
         return true;
       }

@@ -40,12 +40,11 @@ class FirstScreen extends StatelessWidget {
       Expanded(child: Text("seleccione un tipo de contrato: ")),
       Expanded(
         child: DropdownMenu<String>(
-          initialSelection: customersController.contractTypes.first.name,
+          initialSelection: "-------",
           onSelected: (String? value) {
             customersController.selectedContract = value!;
           },
-          dropdownMenuEntries: customersController.contractTypes
-              .map<DropdownMenuEntry<String>>((ContractType value) {
+          dropdownMenuEntries: customersController.contractTypes.map<DropdownMenuEntry<String>>((ContractType value) {
             return DropdownMenuEntry<String>(
                 value: value.name, label: value.name);
           }).toList(),
