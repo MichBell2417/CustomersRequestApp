@@ -137,9 +137,15 @@ class ApplicationController extends ChangeNotifier{
     return false;
   }
 //--------------------------------------------------------- part to edit the hours remain
-  removeHours(){
+  bool removeHours(){
     TimeOfDay remainingTime = customer!.remainingContractTime;
     TimeOfDay timeToRemove = workHoursContadas();
+    if(timeToRemove.minute==0 && timeToRemove.hour==0){
+      return false;
+    }
+    if(_serviceInShop==null){
+      return false;
+    }
     int hours=remainingTime.hour-timeToRemove.hour;
     int minutes=remainingTime.minute-timeToRemove.minute;
     if(hours<0){
@@ -148,11 +154,14 @@ class ApplicationController extends ChangeNotifier{
     if(minutes<0){
       if(hours>0){
         hours-=1;
+        minutes=60+minutes;
+      }else{
+        minutes=0;
       }
-      minutes=60+minutes;
     }
     customer!._remainingContractTime=TimeOfDay(hour: hours, minute: minutes);
     notifyListeners();
+    return true;
   }
 //--------------------------------------------------------- part to check the selected radiobutton
   bool? _serviceInShop;
@@ -240,7 +249,7 @@ class ApplicationController extends ChangeNotifier{
       }
       return timeInString(hour, minute);
     }else{
-      return "seleccione un tipo de asistencia";
+      return "00:00";
     }
   }
   static String timeInString(int hour, int minute){

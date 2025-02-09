@@ -44,7 +44,8 @@ class FirstScreen extends StatelessWidget {
           onSelected: (String? value) {
             customersController.selectedContract = value!;
           },
-          dropdownMenuEntries: customersController.contractTypes.map<DropdownMenuEntry<String>>((ContractType value) {
+          dropdownMenuEntries: customersController.contractTypes
+              .map<DropdownMenuEntry<String>>((ContractType value) {
             return DropdownMenuEntry<String>(
                 value: value.name, label: value.name);
           }).toList(),
@@ -106,7 +107,10 @@ class FirstScreen extends StatelessWidget {
                             ),
                           ),
                         ]),
-                        Container(child: customersController.customer == null ? graphicPartContract : null),
+                        Container(
+                            child: customersController.customer == null
+                                ? graphicPartContract
+                                : null),
                         ElevatedButton(
                             onPressed: () {
                               if (customersController.customer != null) {
@@ -188,7 +192,7 @@ class FirstScreen extends StatelessWidget {
                                       customersController.alert(
                                           context,
                                           "Error",
-                                          "The customer doesn't exist.");
+                                          "The customer doesn't exist. To create it fill the information and save.");
                                       nombreController.text = "";
                                       emailController.text = "";
                                       numeroDeTelefonoController.text = "";
@@ -208,7 +212,8 @@ class FirstScreen extends StatelessWidget {
                                       "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType.name : ""}")),
                               Expanded(
                                   child: Text(
-                                      "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}")),
+                                      "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
+                                      style: customersController.customer!=null && customersController.customer!.remainingContractTime.hour==0 && customersController.customer!.remainingContractTime.minute==0 ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold) : null,),),
                             ],
                           ),
                         ),
@@ -217,7 +222,10 @@ class FirstScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: RadioListTile(
-                                  title: Text("En casa del cliente"),
+                                  title: Text(
+                                    "En casa del cliente",
+                                    style: TextStyle(fontSize: 15),
+                                  ),
                                   value: SingingCharacter.casa,
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
@@ -227,7 +235,8 @@ class FirstScreen extends StatelessWidget {
                             ),
                             Expanded(
                               child: RadioListTile(
-                                  title: Text("En la tienda"),
+                                  title: Text("En la tienda",
+                                      style: TextStyle(fontSize: 15)),
                                   value: SingingCharacter.tienda,
                                   groupValue: radioButtonSelection,
                                   onChanged: (SingingCharacter? value) {
@@ -278,9 +287,18 @@ class FirstScreen extends StatelessWidget {
                             Expanded(
                                 child: ElevatedButton(
                                     onPressed: () {
-                                      if (customersController.customer !=
-                                          null) {
-                                        customersController.removeHours();
+                                      if (customersController.customer != null) {
+                                        if (customersController.removeHours()) {
+                                          customersController.alert(
+                                              context,
+                                              "Saved",
+                                              "tiempo ahorrado");
+                                        }else{
+                                          customersController.alert(
+                                              context,
+                                              "Error",
+                                              "error al quitar horas");
+                                        }
                                       } else {
                                         customersController.alert(
                                             context,
