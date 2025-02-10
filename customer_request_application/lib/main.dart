@@ -1,8 +1,24 @@
 import 'package:customer_request_application/classes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:signature/signature.dart';
+
+/*
+import 'package:mysql_client/mysql_client.dart';
+import 'package:http/http.dart' as http;
+import 'package:mysql1/mysql1.dart';*/
 
 void main() {
+  /*final conn = ConnectionSettings(
+      host: "192.168.0.211", // Add your host IP address or server name
+      port: 3306, // Add the port the server is running on
+      user: "tablet", // Your username
+      password: "123456", // Your password
+      db: "divermatica", // Your DataBase name
+    );
+
+  final database = await MySqlConnection.connect(conn);
+  */
   runApp(PrincipalPage());
 }
 
@@ -24,6 +40,7 @@ enum SingingCharacter { casa, tienda }
 //Here you write the interface
 class FirstScreen extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
+  var signTextSyle = TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
   final nombreController = TextEditingController();
   final numeroDeTelefonoController = TextEditingController();
   final emailController = TextEditingController();
@@ -52,6 +69,31 @@ class FirstScreen extends StatelessWidget {
         ),
       ),
     ]);
+
+    final SignatureController controllerCustomers = SignatureController(
+      penStrokeWidth: 2,
+      penColor: Colors.black,
+      exportBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+    );
+    var signatureCanvasCustomers = Signature(
+      controller: controllerCustomers,
+      width: 600,
+      height: 250,
+      backgroundColor: Colors.white,
+    );
+
+    final SignatureController controllerSAT = SignatureController(
+      penStrokeWidth: 2,
+      penColor: Colors.black,
+      exportBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+    );
+    var signatureCanvasSAT = Signature(
+      controller: controllerSAT,
+      width: 600,
+      height: 250,
+      backgroundColor: Colors.white,
+    );
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -62,13 +104,14 @@ class FirstScreen extends StatelessWidget {
             children: [
               Container(
                   color: Colors.amber,
-                  height: 350,
+                  height: 400,
                   child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey, width: 2),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
@@ -211,9 +254,23 @@ class FirstScreen extends StatelessWidget {
                                   child: Text(
                                       "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType.name : ""}")),
                               Expanded(
-                                  child: Text(
-                                      "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
-                                      style: customersController.customer!=null && customersController.customer!.remainingContractTime.hour==0 && customersController.customer!.remainingContractTime.minute==0 ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold) : null,),),
+                                child: Text(
+                                  "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
+                                  style: customersController.customer != null &&
+                                          customersController.customer!
+                                                  .remainingContractTime.hour ==
+                                              0 &&
+                                          customersController
+                                                  .customer!
+                                                  .remainingContractTime
+                                                  .minute ==
+                                              0
+                                      ? TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold)
+                                      : null,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -287,17 +344,14 @@ class FirstScreen extends StatelessWidget {
                             Expanded(
                                 child: ElevatedButton(
                                     onPressed: () {
-                                      if (customersController.customer != null) {
+                                      if (customersController.customer !=
+                                          null) {
                                         if (customersController.removeHours()) {
-                                          customersController.alert(
-                                              context,
-                                              "Saved",
-                                              "tiempo ahorrado");
-                                        }else{
-                                          customersController.alert(
-                                              context,
-                                              "Error",
-                                              "error al quitar horas");
+                                          customersController.alert(context,
+                                              "Saved", "tiempo ahorrado");
+                                        } else {
+                                          customersController.alert(context,
+                                              "Error", "error al quitar horas");
                                         }
                                       } else {
                                         customersController.alert(
@@ -315,7 +369,36 @@ class FirstScreen extends StatelessWidget {
                         )
                       ],
                     ),
-                  ))
+                  )),
+                  Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text("Firma SAT", style: signTextSyle,),
+                            ElevatedButton(onPressed: (){
+                              controllerSAT.clear();
+                            }, child: Text("clean"))
+                          ],
+                        ),
+                        signatureCanvasSAT,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text("Firma Cliente", style: signTextSyle,),
+                            Expanded(
+                              child: ElevatedButton(onPressed: (){
+                                controllerCustomers.clear();
+                              }, child: Text("clean")),
+                            )
+                          ],
+                        ),
+                        signatureCanvasCustomers,
+                      ],
+                    ),
+                  )
             ],
           ),
         ));
