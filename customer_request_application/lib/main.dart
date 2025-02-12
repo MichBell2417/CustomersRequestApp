@@ -1,4 +1,5 @@
 import 'package:customer_request_application/classes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
@@ -77,7 +78,7 @@ class FirstScreen extends StatelessWidget {
     );
     var signatureCanvasCustomers = Signature(
       controller: controllerCustomers,
-      width: 600,
+      width: 500,
       height: 250,
       backgroundColor: Colors.white,
     );
@@ -89,7 +90,7 @@ class FirstScreen extends StatelessWidget {
     );
     var signatureCanvasSAT = Signature(
       controller: controllerSAT,
-      width: 600,
+      width: 500,
       height: 250,
       backgroundColor: Colors.white,
     );
@@ -103,13 +104,10 @@ class FirstScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                  color: Colors.amber,
+                  color: const Color.fromARGB(255, 123, 168, 204),
                   height: 400,
                   child: Container(
                     padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 2),
-                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -157,17 +155,26 @@ class FirstScreen extends StatelessWidget {
                         ElevatedButton(
                             onPressed: () {
                               if (customersController.customer != null) {
-                                if (!customersController.upgradeData(
-                                    int.parse(customerNumberController.text),
-                                    nombreController.text,
-                                    emailController.text,
-                                    numeroDeTelefonoController.text,
-                                    streetController.text)) {
+                                try {
+                                  if (!customersController.upgradeData(
+                                      int.parse(customerNumberController.text),
+                                      nombreController.text,
+                                      emailController.text,
+                                      numeroDeTelefonoController.text,
+                                      streetController.text)) {
+                                    customersController.alert(
+                                        context, "Error", "Not upgraded");
+                                  } else {
+                                    customersController.alert(
+                                        context,
+                                        "Upgraded",
+                                        "The customer has been upgraded");
+                                  }
+                                } catch (e) {
                                   customersController.alert(
-                                      context, "Error", "Not upgraded");
-                                } else {
-                                  customersController.alert(context, "Upgraded",
-                                      "The customer has been upgraded");
+                                        context,
+                                        "Error",
+                                        "check if the data are correct");
                                 }
                               } else {
                                 if (customersController.addCustomer(
@@ -196,11 +203,10 @@ class FirstScreen extends StatelessWidget {
                     ),
                   )),
               Container(
-                  height: 400,
+                  color: const Color.fromARGB(255, 123, 168, 204),
+                  height: 350,
                   child: Container(
                     padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 2)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -340,8 +346,10 @@ class FirstScreen extends StatelessWidget {
                           ],
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Expanded(
+                                flex: 2,
                                 child: ElevatedButton(
                                     onPressed: () {
                                       if (customersController.customer !=
@@ -361,7 +369,9 @@ class FirstScreen extends StatelessWidget {
                                       }
                                     },
                                     child: Text("Save"))),
+                            Spacer(),
                             Expanded(
+                                flex: 2,
                                 child: ElevatedButton(
                                     onPressed: () {},
                                     child: Text("View Data"))),
@@ -370,35 +380,45 @@ class FirstScreen extends StatelessWidget {
                       ],
                     ),
                   )),
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Container(
+                color: const Color.fromARGB(255, 123, 168, 204),
+                height: 650,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text("Firma SAT", style: signTextSyle,),
-                            ElevatedButton(onPressed: (){
+                        Text(
+                          "Firma SAT",
+                          style: signTextSyle,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
                               controllerSAT.clear();
-                            }, child: Text("clean"))
-                          ],
-                        ),
-                        signatureCanvasSAT,
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text("Firma Cliente", style: signTextSyle,),
-                            Expanded(
-                              child: ElevatedButton(onPressed: (){
-                                controllerCustomers.clear();
-                              }, child: Text("clean")),
-                            )
-                          ],
-                        ),
-                        signatureCanvasCustomers,
+                            },
+                            child: Text("clean"))
                       ],
                     ),
-                  )
+                    signatureCanvasSAT,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          "Firma Cliente",
+                          style: signTextSyle,
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              controllerCustomers.clear();
+                            },
+                            child: Text("clean")),
+                      ],
+                    ),
+                    signatureCanvasCustomers,
+                  ],
+                ),
+              )
             ],
           ),
         ));
