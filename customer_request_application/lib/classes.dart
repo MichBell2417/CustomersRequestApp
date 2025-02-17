@@ -63,7 +63,7 @@ class ApplicationController extends ChangeNotifier{
   List<Customer> customers = [];
 
   //------------------------------------------ usefull metods to comunicate with the db
-  late final MySqlConnection database;
+  MySqlConnection? database;
   void conecctionDb() async {
     final conn = ConnectionSettings(
       host: "192.168.0.211", // Add your host IP address or server name
@@ -74,17 +74,17 @@ class ApplicationController extends ChangeNotifier{
     );
     try {
       database = await MySqlConnection.connect(conn);
+      pullContracts();
+      pullCustomers();
       connectionStatus=true;
     } catch (e) {
       connectionStatus=false;
       alert(classContext!, "databese error", "database connection failed, check the wifi status");
     }
-    pullContracts();
-    pullCustomers();
   }
   /// in this method the customers are taken from the database and saved inside the "customers" vector
   void pullCustomers() async {
-    var result = await database.query('SELECT * FROM customer');
+    var result = await database!.query('SELECT * FROM customer');
     customers.clear();
     for(var customerDB in result){
       Duration time=customerDB['remaining_time'];
@@ -99,7 +99,7 @@ class ApplicationController extends ChangeNotifier{
   }
 
   void pullContracts() async {
-    var result = await database.query('SELECT * FROM contract');
+    var result = await database!.query('SELECT * FROM contract');
     contractTypes.clear();
     for(var contract in result){
       Duration time=contract['time_duration'];
