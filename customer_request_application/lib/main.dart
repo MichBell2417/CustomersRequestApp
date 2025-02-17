@@ -1,25 +1,9 @@
 import 'package:customer_request_application/classes.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 
-/*
-import 'package:mysql_client/mysql_client.dart';
-import 'package:http/http.dart' as http;
-import 'package:mysql1/mysql1.dart';*/
-
-void main() {
-  /*final conn = ConnectionSettings(
-      host: "192.168.0.211", // Add your host IP address or server name
-      port: 3306, // Add the port the server is running on
-      user: "tablet", // Your username
-      password: "123456", // Your password
-      db: "divermatica", // Your DataBase name
-    );
-
-  final database = await MySqlConnection.connect(conn);
-  */
+Future<void> main() async {
   runApp(PrincipalPage());
 }
 
@@ -35,9 +19,7 @@ class PrincipalPage extends StatelessWidget {
   }
 }
 
-//
 enum SingingCharacter { casa, tienda }
-
 //Here you write the interface
 class FirstScreen extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
@@ -54,6 +36,10 @@ class FirstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var customersController = context.watch<ApplicationController>();
+    if(!customersController.connectionStatus){
+      customersController.classContext=context;
+      customersController.conecctionDb();
+    }
     Widget graphicPartContract = Row(children: [
       Expanded(child: Text("seleccione un tipo de contrato: ")),
       Expanded(
@@ -241,7 +227,7 @@ class FirstScreen extends StatelessWidget {
                                       customersController.alert(
                                           context,
                                           "Error",
-                                          "The customer doesn't exist. To create it fill the information and save.");
+                                          "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
                                       nombreController.text = "";
                                       emailController.text = "";
                                       numeroDeTelefonoController.text = "";

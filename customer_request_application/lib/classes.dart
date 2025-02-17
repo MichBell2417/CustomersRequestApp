@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import 'package:mysql1/mysql1.dart';
 
 class Customer{
   String _name;
@@ -56,18 +57,63 @@ class ContractType {
 
 class ApplicationController extends ChangeNotifier{
   Customer? customer;
+  BuildContext? classContext;
+  bool connectionStatus=false;
+  final List<ContractType> contractTypes = <ContractType>[];
+  List<Customer> customers = [];
 
-  final List<ContractType> contractTypes = <ContractType>[
-    ContractType("decima",TimeOfDay(hour: 20, minute: 0)),
-    ContractType("secunda",TimeOfDay(hour: 15, minute: 0)),
-    ContractType("terza",TimeOfDay(hour: 10, minute: 0)),
-    ContractType("quarta",TimeOfDay(hour: 5, minute: 0))
-  ];
-  //TODO: the data customer will be archived in csv file and the process will be automated
-  List<Customer> customers = [
-    Customer("Marco", "xx@gmail.com", "3333333333", "via, Marco Ruspi", TimeOfDay(hour: 10, minute: 0),ContractType("decima",TimeOfDay(hour: 20, minute: 0)),), 
-    //Customer("Luca", "luce@gmail.com", "334555555", "via, Lucio Armando", TimeOfDay(hour: 15, minute: 0), "20h"),
-    ];
+  //------------------------------------------ usefull metods to comunicate with the db
+  late final MySqlConnection database;
+  void conecctionDb() async {
+    final conn = ConnectionSettings(
+      host: "192.168.0.211", // Add your host IP address or server name
+      port: 3306, // Add the port the server is running on
+      user: "tablet", // Your username
+      password: "123456", // Your password
+      db: "divermatica", // Your DataBase name
+    );
+    try {
+      database = await MySqlConnection.connect(conn);
+      connectionStatus=true;
+    } catch (e) {
+      connectionStatus=false;
+      alert(classContext!, "databese error", "database connection failed, check the wifi status");
+    }
+    pullContracts();
+    pullCustomers();
+  }
+  /// in this method the customers are taken from the database and saved inside the "customers" vector
+  void pullCustomers() async {
+    var result = await database.query('SELECT * FROM customer');
+    customers.clear();
+    for(var customerDB in result){
+      Duration time=customerDB['remaining_time'];
+      int minutes=time.inMinutes;
+      int hours=0;
+      if(minutes>=60){
+        hours=(minutes/60).toInt();
+        minutes=minutes-hours*60;
+      }
+      customers.add(Customer(customerDB['name'], customerDB['email'], customerDB['phone_number'], customerDB['street'], TimeOfDay(hour: hours, minute: minutes), contractTypes[customerDB['id_contract']]));
+    }
+  }
+
+  void pullContracts() async {
+    var result = await database.query('SELECT * FROM contract');
+    contractTypes.clear();
+    for(var contract in result){
+      Duration time=contract['time_duration'];
+      int minutes=time.inMinutes;
+      int hours=0;
+      if(minutes>=60){
+        hours=(minutes/60).toInt();
+        minutes=minutes-hours*60;
+      }
+      contractTypes.add(ContractType(contract['name'], TimeOfDay(hour: hours, minute: minutes)));
+    }
+  }
+
+
   String selectedContract="";
   bool upgradeData(int index, String name, String eMail, String phoneNumber, String street){
     if(!eMail.contains('@')){
@@ -120,19 +166,16 @@ class ApplicationController extends ChangeNotifier{
 //--------------------------------------------------------- part to find the customer from his number
   //the customer number is the corresponding index in the vector "customers"
   bool findNumberCustomer(String indexStr){
+    customer=null;
+    notifyListeners();
     try{
       int index=int.parse(indexStr);
       try {
         customer=customers[index];
         notifyListeners();
         return true;
-      } catch (e) {
-        print("error customer no exist");
-      }
-    }catch(e){
-      print("error insert a number");
-    }
-    customer=null;
+      } catch (e){}
+    }catch(e){}
     notifyListeners();
     return false;
   }
