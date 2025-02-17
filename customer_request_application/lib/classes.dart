@@ -111,6 +111,7 @@ class ApplicationController extends ChangeNotifier{
       }
       contractTypes.add(ContractType(contract['name'], TimeOfDay(hour: hours, minute: minutes)));
     }
+    notifyListeners();
   }
 
 
