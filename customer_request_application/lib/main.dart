@@ -20,6 +20,7 @@ class PrincipalPage extends StatelessWidget {
 }
 
 enum SingingCharacter { casa, tienda }
+
 //Here you write the interface
 class FirstScreen extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
@@ -36,8 +37,8 @@ class FirstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var customersController = context.watch<ApplicationController>();
-    if(!customersController.connectionStatus){
-      customersController.classContext=context;
+    if (!customersController.connectionStatus) {
+      customersController.classContext = context;
       customersController.conecctionDb();
     }
     Widget graphicPartContract = Row(children: [
@@ -141,45 +142,22 @@ class FirstScreen extends StatelessWidget {
                         ElevatedButton(
                             onPressed: () {
                               if (customersController.customer != null) {
-                                try {
-                                  if (!customersController.upgradeData(
-                                      int.parse(customerNumberController.text),
-                                      nombreController.text,
-                                      emailController.text,
-                                      numeroDeTelefonoController.text,
-                                      streetController.text)) {
-                                    customersController.alert(
-                                        context, "Error", "Not upgraded");
-                                  } else {
-                                    customersController.alert(
-                                        context,
-                                        "Upgraded",
-                                        "The customer has been upgraded");
-                                  }
-                                } catch (e) {
-                                  customersController.alert(
-                                        context,
-                                        "Error",
-                                        "check if the data are correct");
-                                }
-                              } else {
-                                if (customersController.addCustomer(
+                                customersController.upgradeData(
+                                    int.parse(customerNumberController.text),
                                     nombreController.text,
                                     emailController.text,
                                     numeroDeTelefonoController.text,
-                                    streetController.text)) {
-                                  nombreController.text = "";
-                                  emailController.text = "";
-                                  numeroDeTelefonoController.text = "";
-                                  streetController.text = "";
-                                  customersController.alert(context, "Saved",
-                                      "the customer has been saved");
-                                } else {
-                                  customersController.alert(
-                                      context,
-                                      "Not saved",
-                                      "the customer hasn't been saved");
-                                }
+                                    streetController.text);
+                              } else {
+                                customersController.addCustomer(
+                                    nombreController.text,
+                                    emailController.text,
+                                    numeroDeTelefonoController.text,
+                                    streetController.text);
+                                nombreController.text = "";
+                                emailController.text = "";
+                                numeroDeTelefonoController.text = "";
+                                streetController.text = "";
                               }
                             },
                             child: Text(customersController.customer != null
@@ -211,19 +189,24 @@ class FirstScreen extends StatelessWidget {
                             ),
                             Expanded(
                               child: ElevatedButton(
-                                  onPressed: () {
-                                    if (customersController.findNumberCustomer(
-                                        customerNumberController.text)) {
-                                      nombreController.text =
-                                          customersController.customer!.name;
-                                      emailController.text =
-                                          customersController.customer!.eMail;
-                                      numeroDeTelefonoController.text =
-                                          customersController
-                                              .customer!.phoneNumber;
-                                      streetController.text =
-                                          customersController.customer!.street;
-                                    } else {
+                                  onPressed: () async {
+                                    try {
+                                      if (await customersController.findCustomerFromNumberdb(int.parse(
+                                              customerNumberController.text))) {
+                                        nombreController.text =
+                                            customersController.customer!.name;
+                                        emailController.text =
+                                            customersController.customer!.eMail;
+                                        numeroDeTelefonoController.text =
+                                            customersController
+                                                .customer!.phoneNumber;
+                                        streetController.text =
+                                            customersController
+                                                .customer!.street;
+                                      } else {
+                                        throw Exception();
+                                      }
+                                    } catch (e) {
                                       customersController.alert(
                                           context,
                                           "Error",
@@ -337,15 +320,13 @@ class FirstScreen extends StatelessWidget {
                             Expanded(
                                 flex: 2,
                                 child: ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       if (customersController.customer !=
                                           null) {
-                                        if (customersController.removeHours()) {
+                                        if (await customersController.removeHours(int.parse(
+                                              customerNumberController.text))) {
                                           customersController.alert(context,
                                               "Saved", "tiempo ahorrado");
-                                        } else {
-                                          customersController.alert(context,
-                                              "Error", "error al quitar horas");
                                         }
                                       } else {
                                         customersController.alert(
