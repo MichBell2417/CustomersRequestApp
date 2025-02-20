@@ -233,8 +233,8 @@ class FirstScreen extends StatelessWidget {
                                   onPressed: () async {
                                     try {
                                       styleTextSearchField=TextStyle(color: Colors.black);
-                                      if (await customersController.findNumberCustomer(
-                                        customerNumberController.text)) {
+                                      if (await customersController.findCustomerFromNumberdb(
+                                        int.parse(customerNumberController.text))) {
                                         nombreController.text =
                                             customersController.customer!.name;
                                         emailController.text =
@@ -262,7 +262,7 @@ class FirstScreen extends StatelessWidget {
                                       customersController.notifyListenersLocal();
                                     }
                                   },
-                                  child: Text("search")),
+                                child: Text("search")),
                             )
                           ],
                         ),
