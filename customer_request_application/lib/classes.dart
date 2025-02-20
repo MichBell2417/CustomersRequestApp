@@ -67,6 +67,12 @@ class ApplicationController extends ChangeNotifier {
   bool connectionStatus = false;
   final List<ContractType> contractTypes = <ContractType>[];
   List<Customer> customers = [];
+  
+  //------------------------------------------ notifyListeners();
+  @override
+  void notifyListenersLocal(){
+    notifyListeners();
+  }
 
   //------------------------------------------ usefull metods to comunicate with the db
   MySqlConnection? database;
@@ -219,14 +225,15 @@ class ApplicationController extends ChangeNotifier {
 
   Future<bool> findCustomerFromNumberdb(int index) async {
     Results customerdb;
-
+    var customerLocal;
     try {
-      customerdb =
-          await database!.query("SELECT * FROM customer WHERE id='$index'");
+      customerdb = await database!.query("SELECT * FROM customer WHERE id='$index'");
+      customerLocal = customerdb.toList().first;
     } catch (e) {
+      this.customer=null;
+      notifyListeners();
       return false;
     }
-    var customerLocal = customerdb.toList().first;
 
     Duration time = customerLocal['remaining_time'];
     int minutes = time.inMinutes;

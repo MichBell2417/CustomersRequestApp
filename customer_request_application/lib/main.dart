@@ -32,6 +32,7 @@ class FirstScreen extends StatelessWidget {
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
   final streetController = TextEditingController();
+  TextStyle styleTextSearchField=TextStyle(color: Colors.black);
   SingingCharacter? radioButtonSelection;
 
   @override
@@ -139,30 +140,53 @@ class FirstScreen extends StatelessWidget {
                             child: customersController.customer == null
                                 ? graphicPartContract
                                 : null),
-                        ElevatedButton(
-                            onPressed: () {
-                              if (customersController.customer != null) {
-                                customersController.upgradeData(
-                                    int.parse(customerNumberController.text),
-                                    nombreController.text,
-                                    emailController.text,
-                                    numeroDeTelefonoController.text,
-                                    streetController.text);
-                              } else {
-                                customersController.addCustomer(
-                                    nombreController.text,
-                                    emailController.text,
-                                    numeroDeTelefonoController.text,
-                                    streetController.text);
-                                nombreController.text = "";
-                                emailController.text = "";
-                                numeroDeTelefonoController.text = "";
-                                streetController.text = "";
-                              }
-                            },
-                            child: Text(customersController.customer != null
-                                ? "UPGRADE"
-                                : "SAVE")),
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (customersController.customer != null) {
+                                  customersController.upgradeData(
+                                      int.parse(customerNumberController.text),
+                                      nombreController.text,
+                                      emailController.text,
+                                      numeroDeTelefonoController.text,
+                                      streetController.text);
+                                } else {
+                                  customersController.addCustomer(
+                                      nombreController.text,
+                                      emailController.text,
+                                      numeroDeTelefonoController.text,
+                                      streetController.text);
+                                  nombreController.text = "";
+                                  emailController.text = "";
+                                  numeroDeTelefonoController.text = "";
+                                  streetController.text = "";
+                                }
+                              },
+                              child: Text(customersController.customer != null
+                                  ? "UPGRADE"
+                                  : "SAVE")
+                              ),
+                          ),
+                          Expanded(
+                            child: Container(child:
+                              customersController.customer != null ? 
+                              ElevatedButton(
+                                onPressed: (){
+                                  customersController.customer=null;
+                                  customersController.notifyListenersLocal();
+                                }, 
+                                child: Icon(
+                                  Icons.add_circle_outline_sharp,
+                                  color: Colors.blueGrey,
+                                  size: 24.0,
+                                  semanticLabel: 'add a new customers',
+                                ),
+                              ) : null
+                            ),
+                          ),
+                        ],
+                        ),
                       ],
                     ),
                   )),
@@ -184,6 +208,7 @@ class FirstScreen extends StatelessWidget {
                             Expanded(
                               flex: 2,
                               child: TextFormField(
+                                style: styleTextSearchField,
                                 controller: customerNumberController,
                               ),
                             ),
@@ -191,8 +216,9 @@ class FirstScreen extends StatelessWidget {
                               child: ElevatedButton(
                                   onPressed: () async {
                                     try {
-                                      if (await customersController.findCustomerFromNumberdb(int.parse(
-                                              customerNumberController.text))) {
+                                      styleTextSearchField=TextStyle(color: Colors.black);
+                                      if (await customersController.findCustomerFromNumberdb(
+                                        int.parse(customerNumberController.text))) {
                                         nombreController.text =
                                             customersController.customer!.name;
                                         emailController.text =
@@ -204,17 +230,20 @@ class FirstScreen extends StatelessWidget {
                                             customersController
                                                 .customer!.street;
                                       } else {
-                                        throw Exception();
+                                        customersController.customer = null;
+                                        customersController.alert(
+                                            context,
+                                            "Error",
+                                            "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
+                                        nombreController.text = "";
+                                        emailController.text = "";
+                                        numeroDeTelefonoController.text = "";
+                                        streetController.text = "";
                                       }
                                     } catch (e) {
-                                      customersController.alert(
-                                          context,
-                                          "Error",
-                                          "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
-                                      nombreController.text = "";
-                                      emailController.text = "";
-                                      numeroDeTelefonoController.text = "";
-                                      streetController.text = "";
+                                      styleTextSearchField=TextStyle(color: Colors.red, fontWeight: FontWeight.bold);
+                                      customerNumberController.text="write customer number";
+                                      customersController.notifyListenersLocal();
                                     }
                                   },
                                   child: Text("search")),
@@ -231,15 +260,7 @@ class FirstScreen extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
-                                  style: customersController.customer != null &&
-                                          customersController.customer!
-                                                  .remainingContractTime.hour ==
-                                              0 &&
-                                          customersController
-                                                  .customer!
-                                                  .remainingContractTime
-                                                  .minute ==
-                                              0
+                                  style: customersController.customer != null && customersController.customer!.remainingContractTime.hour == 0 && customersController.customer!.remainingContractTime.minute == 0
                                       ? TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold)
@@ -323,8 +344,10 @@ class FirstScreen extends StatelessWidget {
                                     onPressed: () async {
                                       if (customersController.customer !=
                                           null) {
-                                        if (await customersController.removeHours(int.parse(
-                                              customerNumberController.text))) {
+                                        if (await customersController
+                                            .removeHours(int.parse(
+                                                customerNumberController
+                                                    .text))) {
                                           customersController.alert(context,
                                               "Saved", "tiempo ahorrado");
                                         }
