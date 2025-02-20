@@ -85,8 +85,18 @@ class FirstScreen extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Text('Control del cliente'),
+          flexibleSpace: 
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                tileMode: TileMode.clamp,
+                colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+              ),
+            ),
+          leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+          title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -140,27 +150,29 @@ class FirstScreen extends StatelessWidget {
                             child: customersController.customer == null
                                 ? graphicPartContract
                                 : null),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Expanded(
+                            flex: 3,
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (customersController.customer != null) {
                                   customersController.upgradeData(
-                                      int.parse(customerNumberController.text),
-                                      nombreController.text,
-                                      emailController.text,
-                                      numeroDeTelefonoController.text,
-                                      streetController.text);
-                                } else {
-                                  customersController.addCustomer(
-                                      nombreController.text,
-                                      emailController.text,
-                                      numeroDeTelefonoController.text,
-                                      streetController.text);
-                                  nombreController.text = "";
-                                  emailController.text = "";
-                                  numeroDeTelefonoController.text = "";
-                                  streetController.text = "";
+                                    int.parse(customerNumberController.text),
+                                    nombreController.text,
+                                    emailController.text,
+                                    numeroDeTelefonoController.text,
+                                    streetController.text);
+                                } else{
+                                  if(await customersController.addCustomer(
+                                    nombreController.text,
+                                    emailController.text,
+                                    numeroDeTelefonoController.text,
+                                    streetController.text)){
+                                      nombreController.text = "";
+                                      emailController.text = "";
+                                      numeroDeTelefonoController.text = "";
+                                      streetController.text = "";
+                                    }
                                 }
                               },
                               child: Text(customersController.customer != null
@@ -168,22 +180,26 @@ class FirstScreen extends StatelessWidget {
                                   : "SAVE")
                               ),
                           ),
-                          Expanded(
-                            child: Container(child:
-                              customersController.customer != null ? 
-                              ElevatedButton(
-                                onPressed: (){
-                                  customersController.customer=null;
-                                  customersController.notifyListenersLocal();
-                                }, 
-                                child: Icon(
-                                  Icons.add_circle_outline_sharp,
-                                  color: Colors.blueGrey,
-                                  size: 24.0,
-                                  semanticLabel: 'add a new customers',
-                                ),
-                              ) : null
-                            ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10,0,0,0),
+                            child:
+                            customersController.customer != null ? 
+                            ElevatedButton(
+                              onPressed: (){
+                                customersController.customer=null;
+                                nombreController.text = "";
+                                emailController.text = "";
+                                numeroDeTelefonoController.text = "";
+                                streetController.text = "";
+                                customersController.notifyListenersLocal();
+                              }, 
+                              child: Icon(
+                                Icons.add_circle_outline_sharp,
+                                color: Colors.blueGrey,
+                                size: 24.0,
+                                semanticLabel: 'add a new customers',
+                              ),
+                            ) : null
                           ),
                         ],
                         ),
@@ -217,8 +233,8 @@ class FirstScreen extends StatelessWidget {
                                   onPressed: () async {
                                     try {
                                       styleTextSearchField=TextStyle(color: Colors.black);
-                                      if (await customersController.findCustomerFromNumberdb(
-                                        int.parse(customerNumberController.text))) {
+                                      if (await customersController.findNumberCustomer(
+                                        customerNumberController.text)) {
                                         nombreController.text =
                                             customersController.customer!.name;
                                         emailController.text =

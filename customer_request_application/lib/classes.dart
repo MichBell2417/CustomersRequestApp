@@ -65,11 +65,10 @@ class ApplicationController extends ChangeNotifier {
   Customer? customer;
   BuildContext? classContext;
   bool connectionStatus = false;
-  final List<ContractType> contractTypes = <ContractType>[];
+  final List<ContractType> contractTypes = <ContractType>[ContractType("primo", TimeOfDay(hour: 10, minute: 0))];
   List<Customer> customers = [];
   
   //------------------------------------------ notifyListeners();
-  @override
   void notifyListenersLocal(){
     notifyListeners();
   }
@@ -145,7 +144,7 @@ class ApplicationController extends ChangeNotifier {
             "UPDATE customer SET name = '$name', email='$eMail', phone_number='$phoneNumber', street='$street', CP='6523' WHERE id = $index ");
         alert(classContext!, "Upgraded", "The customer has been upgraded");
       } catch (e) {
-        alert(classContext!, "Error", "check if the data are correct");
+        alert(classContext!, "Error", "check if the data are correct or check the connection to database.");
       }
     }
     /*try {
@@ -157,8 +156,7 @@ class ApplicationController extends ChangeNotifier {
     }*/
   }
 
-  void addCustomer(
-      String name, String eMail, String phoneNumber, String street) async {
+  Future<bool> addCustomer(String name, String eMail, String phoneNumber, String street) async {
     ContractType? contract;
     if (selectedContract != "") {
       for (int i = 0; i < contractTypes.length; i++) {
@@ -168,24 +166,31 @@ class ApplicationController extends ChangeNotifier {
         }
       }
       if (contract != null && eMail.contains('@')) {
-        customers.add(Customer(
-            name, eMail, phoneNumber, street, contract.time, contract));
-        //print(contract.name);
-        var contractdb = await database!.query(
-            'SELECT id,time_duration FROM contract WHERE name="${contract.name}" ');
-        //print(id_contract.toList().first['id']);
-        var id_contract = contractdb.toList().first['id'];
-        var time_duration = contractdb.toList().first['time_duration'];
-        //print(id_contract.runtimeType);
-        //print(time_duration.runtimeType);
+        customers.add(Customer(name, eMail, phoneNumber, street, contract.time, contract));
         try {
+          //print(contract.name);
+          var contractdb = await database!.query(
+              'SELECT id,time_duration FROM contract WHERE name="${contract.name}" ');
+          //print(id_contract.toList().first['id']);
+          var id_contract = contractdb.toList().first['id'];
+          var time_duration = contractdb.toList().first['time_duration'];
+          //print(id_contract.runtimeType);
+          //print(time_duration.runtimeType);
           var result = await database!.query(
               "INSERT INTO customer (name,email,phone_number,street,CP,id_contract,remaining_time) VALUES ('$name','$eMail','$phoneNumber','$street','5432','$id_contract','$time_duration')");
-          alert(classContext!, "Saved", "the customer has been saved");
+          alert(classContext!, "Saved", "the customer has been saved in database");
+          return true;
         } catch (e) {
-          alert(classContext!, "Not saved", "the customer hasn't been saved");
+          alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
+          return false;
         }
+      }else {
+        alert(classContext!, "Not saved", "Insert a valid Email");
+        return false;
       }
+    }else{
+      alert(classContext!, "Not saved", "Select a contract");
+      return false;
     }
   }
 
