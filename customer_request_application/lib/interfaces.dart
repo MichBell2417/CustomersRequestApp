@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:customer_request_application/classes.dart';
 import 'package:signature/signature.dart';
 
+///-------------------------------- class with the interface to control the customers
 class Menu extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,7 @@ class Menu extends StatelessWidget{
   }
 }
 
+///-------------------------------- class with the interface to manage the hours
 class customerView extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
@@ -87,6 +89,7 @@ class customerView extends StatelessWidget{
   }
 }
 
+///-------------------------------- class with the interface for the menu
 enum SingingCharacter { casa, tienda }
 class BuenoDeHoras extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
