@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import "package:flutter/material.dart";
 import 'package:mysql1/mysql1.dart';
 
@@ -67,6 +65,7 @@ class ApplicationController extends ChangeNotifier {
   bool connectionStatus = false;
   final List<ContractType> contractTypes = <ContractType>[ContractType("primo", TimeOfDay(hour: 10, minute: 0))];
   List<Customer> customers = [];
+  String IPaddress = "192.168.0.146";
   
   //------------------------------------------ notifyListeners();
   void notifyListenersLocal(){
@@ -75,24 +74,72 @@ class ApplicationController extends ChangeNotifier {
 
   //------------------------------------------ usefull metods to comunicate with the db
   MySqlConnection? database;
-  void conecctionDb() async {
+  void connectionDb() async {
     final conn = ConnectionSettings(
-      host: "192.168.0.146", // Add your host IP address or server name
+      host: IPaddress, // Add your host IP address or server name
       port: 3306, // Add the port the server is running on
       user: "tablet", // Your username
       password: "123456", // Your password
       db: "divermatica", // Your DataBase name
     );
-    try {
-      database = await MySqlConnection.connect(conn);
-      connectionStatus = true;
-      pullContracts();
-      pullCustomers();
-    } catch (e) {
-      connectionStatus = false;
-      alert(classContext!, "database error",
-          "database connection failed, check the wifi status");
+    chargingdDb(classContext!);
+    while(!connectionStatus){
+      try {
+        database = await MySqlConnection.connect(conn);
+        connectionStatus = true;
+        pullContracts();
+        pullCustomers();
+        Navigator.of(classContext!).pop();
+        print("interface closed");
+      } catch (e) {
+        connectionStatus = false;
+        //alert(classContext!, "database error",
+          //"database connection failed, check the wifi status");
+      }
+      /*
+      Future.delayed(const Duration(milliseconds: 500), () {
+        print('control again?.'); // Prints after 1 second.
+      });*/
     }
+  }
+  //charching interface for database
+  void chargingdDb(BuildContext context) {
+    print("interface start");
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return Scaffold(
+              appBar: AppBar(
+                flexibleSpace: 
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      tileMode: TileMode.clamp,
+                      colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+                    ),
+                  ),
+                leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+                title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
+              ),
+              body: Container(
+                  alignment: Alignment.center,
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                          textAlign: TextAlign.center,
+                          "Connection to Database at IP: $IPaddress..."),
+                    ],
+                  )
+              )
+          );
+        },
+      ),
+    );
+    print("interface end");
   }
 
   /// in this method the customers are taken from the database and saved inside the "customers" vector
@@ -140,7 +187,7 @@ class ApplicationController extends ChangeNotifier {
       String street) async {
     if (eMail.contains('@')) {
       try {
-        var result = await database!.query(
+        await database!.query(
             "UPDATE customer SET name = '$name', email='$eMail', phone_number='$phoneNumber', street='$street', CP='6523' WHERE id = $index ");
         alert(classContext!, "Upgraded", "The customer has been upgraded");
       } catch (e) {
@@ -176,7 +223,7 @@ class ApplicationController extends ChangeNotifier {
           var time_duration = contractdb.toList().first['time_duration'];
           //print(id_contract.runtimeType);
           //print(time_duration.runtimeType);
-          var result = await database!.query(
+          await database!.query(
               "INSERT INTO customer (name,email,phone_number,street,CP,id_contract,remaining_time) VALUES ('$name','$eMail','$phoneNumber','$street','5432','$id_contract','$time_duration')");
           alert(classContext!, "Saved", "the customer has been saved in database");
           return true;
@@ -297,13 +344,13 @@ class ApplicationController extends ChangeNotifier {
 
     var time = TimeOfDay(hour: hours, minute: minutes);
     Duration time_duration = Duration(hours: time.hour, minutes: time.minute);
-    //try {
-      var result = await database!.query(
+    try {
+      await database!.query(
           "UPDATE customer SET remaining_time='$time_duration' WHERE id = $index");
-    //} catch (e) {
-      //alert(classContext!, "Error", "an error occured changing the time");
-      //return false;
-    //}
+    } catch (e) {
+      alert(classContext!, "Error", "an error occured changing the time");
+      return false;
+    }
 
     customer!._remainingContractTime = TimeOfDay(hour: hours, minute: minutes);
     notifyListeners();

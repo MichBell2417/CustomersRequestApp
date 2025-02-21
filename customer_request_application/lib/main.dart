@@ -40,7 +40,9 @@ class FirstScreen extends StatelessWidget {
     var customersController = context.watch<ApplicationController>();
     if (!customersController.connectionStatus) {
       customersController.classContext = context;
-      customersController.conecctionDb();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        customersController.connectionDb();
+      });
     }
     Widget graphicPartContract = Row(children: [
       Expanded(child: Text("seleccione un tipo de contrato: ")),
@@ -68,6 +70,7 @@ class FirstScreen extends StatelessWidget {
       controller: controllerCustomers,
       width: 500,
       height: 250,
+      
       backgroundColor: Colors.white,
     );
 
