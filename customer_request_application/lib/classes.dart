@@ -79,7 +79,7 @@ class ApplicationController extends ChangeNotifier {
       host: IPaddress, // Add your host IP address or server name
       port: 3306, // Add the port the server is running on
       user: "tablet", // Your username
-      password: "123456", // Your password
+      password: "T3cn1c0@2025", // Your password
       db: "divermatica", // Your DataBase name
     );
     chargingdDb(classContext!);
@@ -144,10 +144,10 @@ class ApplicationController extends ChangeNotifier {
 
   /// in this method the customers are taken from the database and saved inside the "customers" vector
   void pullCustomers() async {
-    var result = await database!.query('SELECT * FROM customer');
+    var result = await database!.query('SELECT * FROM clientela');
     customers.clear();
     for (var customerDB in result) {
-      Duration time = customerDB['remaining_time'];
+      Duration time = customerDB['tiempo_restante'];
       int minutes = time.inMinutes;
       int hours = 0;
       if (minutes >= 60) {
@@ -155,20 +155,20 @@ class ApplicationController extends ChangeNotifier {
         minutes = minutes - hours * 60;
       }
       customers.add(Customer(
-          customerDB['name'],
+          customerDB['nombre'],
           customerDB['email'],
-          customerDB['phone_number'],
-          customerDB['street'],
+          customerDB['numero_telefonico'],
+          customerDB['direccion'],
           TimeOfDay(hour: hours, minute: minutes),
-          contractTypes[customerDB['id_contract']]));
+          contractTypes[customerDB['id_contratos']]));
     }
   }
 
   void pullContracts() async {
-    var result = await database!.query('SELECT * FROM contract');
+    var result = await database!.query('SELECT * FROM contratos');
     contractTypes.clear();
     for (var contract in result) {
-      Duration time = contract['time_duration'];
+      Duration time = contract['duracion_contrato'];
       int minutes = time.inMinutes;
       int hours = 0;
       if (minutes >= 60) {
@@ -176,7 +176,7 @@ class ApplicationController extends ChangeNotifier {
         minutes = minutes - hours * 60;
       }
       contractTypes.add(ContractType(
-          contract['name'], TimeOfDay(hour: hours, minute: minutes)));
+          contract['nombre'], TimeOfDay(hour: hours, minute: minutes)));
     }
     notifyListeners();
   }
@@ -188,7 +188,7 @@ class ApplicationController extends ChangeNotifier {
     if (eMail.contains('@')) {
       try {
         await database!.query(
-            "UPDATE customer SET name = '$name', email='$eMail', phone_number='$phoneNumber', street='$street', CP='6523' WHERE id = $index ");
+            "UPDATE clientela SET nombre = '$name', email='$eMail', numero_telefonico='$phoneNumber', direccion='$street', cp='6523', dni='12345678c' WHERE id = $index ");
         alert(classContext!, "Upgraded", "The customer has been upgraded");
       } catch (e) {
         alert(classContext!, "Error", "check if the data are correct or check the connection to database.");
@@ -214,23 +214,23 @@ class ApplicationController extends ChangeNotifier {
       }
       if (contract != null && eMail.contains('@')) {
         customers.add(Customer(name, eMail, phoneNumber, street, contract.time, contract));
-        try {
+        //try {
           //print(contract.name);
           var contractdb = await database!.query(
-              'SELECT id,time_duration FROM contract WHERE name="${contract.name}" ');
+              'SELECT id,duracion_contrato FROM contratos WHERE nombre="${contract.name}" ');
           //print(id_contract.toList().first['id']);
           var id_contract = contractdb.toList().first['id'];
-          var time_duration = contractdb.toList().first['time_duration'];
+          var time_duration = contractdb.toList().first['duracion_contrato'];
           //print(id_contract.runtimeType);
           //print(time_duration.runtimeType);
           await database!.query(
-              "INSERT INTO customer (name,email,phone_number,street,CP,id_contract,remaining_time) VALUES ('$name','$eMail','$phoneNumber','$street','5432','$id_contract','$time_duration')");
+              "INSERT INTO clientela (nombre,email,numero_telefonico,direccion,cp,id_contratos,tiempo_restante,dni) VALUES ('$name','$eMail','$phoneNumber','$street','54352','$id_contract','$time_duration','12345678l')");
           alert(classContext!, "Saved", "the customer has been saved in database");
           return true;
-        } catch (e) {
-          alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
-          return false;
-        }
+        //} catch (e) {
+          //alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
+          //return false;
+        //}
       }else {
         alert(classContext!, "Not saved", "Insert a valid Email");
         return false;
@@ -279,7 +279,7 @@ class ApplicationController extends ChangeNotifier {
     Results customerdb;
     var customerLocal;
     try {
-      customerdb = await database!.query("SELECT * FROM customer WHERE id='$index'");
+      customerdb = await database!.query("SELECT * FROM clientela WHERE id='$index'");
       customerLocal = customerdb.toList().first;
     } catch (e) {
       this.customer=null;
@@ -287,7 +287,7 @@ class ApplicationController extends ChangeNotifier {
       return false;
     }
 
-    Duration time = customerLocal['remaining_time'];
+    Duration time = customerLocal['tiempo_restante'];
     int minutes = time.inMinutes;
     int hours = 0;
     if (minutes >= 60) {
@@ -296,12 +296,12 @@ class ApplicationController extends ChangeNotifier {
     }
 
     customer = Customer(
-        customerLocal['name'],
+        customerLocal['nombre'],
         customerLocal['email'],
-        customerLocal['phone_number'],
-        customerLocal['street'],
+        customerLocal['numero_telefonico'],
+        customerLocal['direccion'],
         TimeOfDay(hour: hours, minute: minutes),
-        contractTypes[customerLocal['id_contract']]);
+        contractTypes[customerLocal['id_contratos']]);
 
     notifyListeners();
 
@@ -311,7 +311,7 @@ class ApplicationController extends ChangeNotifier {
   Future<int> findNumberFromCustomerdb(
       String name, String eMail, String phone_number) async {
     var customerid = await database!.query(
-        "SELECT id FROM costumer WHERE name= '$name' AND email = '$eMail' AND phone_number='$phone_number'");
+        "SELECT id FROM clientela WHERE nombre= '$name' AND email = '$eMail' AND numero_telefonico='$phone_number'");
 
     print(customerid.toList().first['id']);
 
@@ -346,7 +346,7 @@ class ApplicationController extends ChangeNotifier {
     Duration time_duration = Duration(hours: time.hour, minutes: time.minute);
     try {
       await database!.query(
-          "UPDATE customer SET remaining_time='$time_duration' WHERE id = $index");
+          "UPDATE clientela SET tiempo_restante='$time_duration' WHERE id = $index");
     } catch (e) {
       alert(classContext!, "Error", "an error occured changing the time");
       return false;
