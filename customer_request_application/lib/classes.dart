@@ -1,3 +1,4 @@
+import 'dart:async';
 import "package:flutter/material.dart";
 import 'package:mysql1/mysql1.dart';
 
@@ -82,66 +83,28 @@ class ApplicationController extends ChangeNotifier {
       password: "T3cn1c0@2025", // Your password
       db: "divermatica", // Your DataBase name
     );
-    chargingdDb(classContext!);
+    //chargingdDb(classContext!);
+    Timer(const Duration(seconds: 10), (){
+      connectionStatus=true;
+      notifyListeners();
+      alert(classContext!, "database error",
+      "database connection failed, check the wifi or the database status. \n And restart the application.");
+    });
     while(!connectionStatus){
       try {
         database = await MySqlConnection.connect(conn);
         connectionStatus = true;
         pullContracts();
         pullCustomers();
-        Navigator.of(classContext!).pop();
-        print("interface closed");
+        notifyListeners();
+        //Navigator.of(classContext!).pop();
+        //print("interface closed");
       } catch (e) {
         connectionStatus = false;
-        //alert(classContext!, "database error",
-          //"database connection failed, check the wifi status");
       }
-      /*
-      Future.delayed(const Duration(milliseconds: 500), () {
-        print('control again?.'); // Prints after 1 second.
-      });*/
     }
   }
-  //charching interface for database
-  void chargingdDb(BuildContext context) {
-    print("interface start");
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) {
-          return Scaffold(
-              appBar: AppBar(
-                flexibleSpace: 
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      tileMode: TileMode.clamp,
-                      colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
-                    ),
-                  ),
-                leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-                title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
-              ),
-              body: Container(
-                  alignment: Alignment.center,
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                          textAlign: TextAlign.center,
-                          "Connection to Database at IP: $IPaddress..."),
-                    ],
-                  )
-              )
-          );
-        },
-      ),
-    );
-    print("interface end");
-  }
-
+  
   /// in this method the customers are taken from the database and saved inside the "customers" vector
   void pullCustomers() async {
     var result = await database!.query('SELECT * FROM clientela');

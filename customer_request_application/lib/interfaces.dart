@@ -3,10 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:customer_request_application/classes.dart';
 import 'package:signature/signature.dart';
 
+late ApplicationController customersController;
 ///-------------------------------- class with the interface to control the customers
 class Menu extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
+    if (!customersController.connectionStatus) {
+      customersController.classContext = context;
+      customersController.connectionDb();
+    }
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: 
@@ -22,43 +28,70 @@ class Menu extends StatelessWidget{
         leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
         title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
       ),
-      body: Center(child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
         children: [
-          SizedBox(
-            width: 300,
-            height: 75,
-            child: ElevatedButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context){
-                  return customerView();
-                }));
-              }, child: Text("Lista de cliente")
-            ),
+           Center(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return customerView();
+                    }));
+                  }, child: Text("Lista de cliente")
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      return BuenoDeHoras();
+                    }));
+                  }, child: Text("Bonus de horas")
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    // the interface have to be done 
+                    //Navigator.push(context, null);
+                  }, child: Text("Resguardo de deposito")
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            width: 300,
-            height: 75,
-            child: ElevatedButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BuenoDeHoras();
-                }));
-              }, child: Text("Bonus de horas")
-            ),
-          ),
-          SizedBox(
-            width: 300,
-            height: 75,
-            child: ElevatedButton(
-              onPressed: (){
-                // the interface have to be done 
-                //Navigator.push(context, null);
-              }, child: Text("Resguardo de deposito")
+        ),
+        if(!customersController.connectionStatus)
+        Opacity(
+            opacity: 0.8,
+            child: Container(
+              color: Colors.black,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Connection to database with IP address: ${customersController.IPaddress}", 
+                      style: TextStyle(color: Colors.blueAccent, fontSize: 20,),),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                )
+              ),
             ),
           ),
         ],
-      ),),
+      ),
     );
   }
 }
@@ -106,13 +139,6 @@ class BuenoDeHoras extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var customersController = context.watch<ApplicationController>();
-    if (!customersController.connectionStatus) {
-      customersController.classContext = context;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        customersController.connectionDb();
-      });
-    }
     Widget graphicPartContract = Row(children: [
       Expanded(child: Text("seleccione un tipo de contrato: ")),
       Expanded(
