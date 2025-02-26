@@ -1,5 +1,6 @@
 import 'dart:async';
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
 
 class Customer {
@@ -9,8 +10,11 @@ class Customer {
   String _street; //where the customer live
   ContractType _contractType; //the type of contract the customers bougth
   TimeOfDay _remainingContractTime; //time left
-  Customer(this._name, this._eMail, this._phoneNumber, this._street,
-      this._remainingContractTime, this._contractType);
+  String dni;
+  String cp;
+  int id;
+  Customer(this.id, this._name, this._eMail, this._phoneNumber, this._street,
+      this._remainingContractTime, this._contractType, this.dni, this.cp);
   get eMail => _eMail;
   get name => _name;
   get phoneNumber => _phoneNumber;
@@ -64,7 +68,7 @@ class ApplicationController extends ChangeNotifier {
   Customer? customer;
   BuildContext? classContext;
   bool connectionStatus = false;
-  final List<ContractType> contractTypes = <ContractType>[ContractType("primo", TimeOfDay(hour: 10, minute: 0))];
+  final List<ContractType> contractTypes = <ContractType>[];
   List<Customer> customers = [];
   String IPaddress = "192.168.0.146";
   
@@ -85,10 +89,20 @@ class ApplicationController extends ChangeNotifier {
     );
     //chargingdDb(classContext!);
     Timer(const Duration(seconds: 10), (){
-      connectionStatus=true;
-      notifyListeners();
-      alert(classContext!, "database error",
-      "database connection failed, check the wifi or the database status. \n And restart the application.");
+      if (database==null) {
+        connectionStatus=true;
+        notifyListeners();
+        //alert(classContext!, "database error",
+        //"database connection failed, check the wifi or the database status. \n Restart the application.");
+        showDialog<String>(
+        context: classContext!,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("database error"),
+          content: Text("database connection failed, check the wifi or the database status. \n Restart the application."),
+          ),
+        );
+        Timer(const Duration(seconds: 5), (){SystemNavigator.pop();});
+      }
     });
     while(!connectionStatus){
       try {
@@ -100,6 +114,7 @@ class ApplicationController extends ChangeNotifier {
         //Navigator.of(classContext!).pop();
         //print("interface closed");
       } catch (e) {
+        database=null;
         connectionStatus = false;
       }
     }
@@ -108,6 +123,7 @@ class ApplicationController extends ChangeNotifier {
   /// in this method the customers are taken from the database and saved inside the "customers" vector
   void pullCustomers() async {
     var result = await database!.query('SELECT * FROM clientela');
+    //pullContracts();
     customers.clear();
     for (var customerDB in result) {
       Duration time = customerDB['tiempo_restante'];
@@ -118,12 +134,17 @@ class ApplicationController extends ChangeNotifier {
         minutes = minutes - hours * 60;
       }
       customers.add(Customer(
+          customerDB['id'],
           customerDB['nombre'],
           customerDB['email'],
           customerDB['numero_telefonico'],
           customerDB['direccion'],
           TimeOfDay(hour: hours, minute: minutes),
-          contractTypes[customerDB['id_contratos']]));
+          contractTypes[customerDB['id_contratos']-1],
+          customerDB['dni'],
+          customerDB['cp'],
+        )
+      );
     }
   }
 
@@ -146,17 +167,18 @@ class ApplicationController extends ChangeNotifier {
 
   String selectedContract = "";
 
-  void upgradeData(int index, String name, String eMail, String phoneNumber,
-      String street) async {
+  void upgradeData(int index, String name, String eMail, String phoneNumber,String street,String cp,String dni) async {
     if (eMail.contains('@')) {
       try {
         await database!.query(
-            "UPDATE clientela SET nombre = '$name', email='$eMail', numero_telefonico='$phoneNumber', direccion='$street', cp='6523', dni='12345678c' WHERE id = $index ");
+            "UPDATE clientela SET nombre = '$name', email='$eMail', numero_telefonico='$phoneNumber', direccion='$street', cp='$cp', dni='$dni' WHERE id = $index ");
         alert(classContext!, "Upgraded", "The customer has been upgraded");
       } catch (e) {
         alert(classContext!, "Error", "check if the data are correct or check the connection to database.");
       }
+      pullCustomers();
     }
+    notifyListeners();
     /*try {
       customers[index].setName(name);
       customers[index].setEmail(eMail);
@@ -166,7 +188,7 @@ class ApplicationController extends ChangeNotifier {
     }*/
   }
 
-  Future<bool> addCustomer(String name, String eMail, String phoneNumber, String street) async {
+  Future<bool> addCustomer(String name, String eMail, String phoneNumber, String street,String cp,String dni) async {
     ContractType? contract;
     if (selectedContract != "") {
       for (int i = 0; i < contractTypes.length; i++) {
@@ -176,8 +198,7 @@ class ApplicationController extends ChangeNotifier {
         }
       }
       if (contract != null && eMail.contains('@')) {
-        customers.add(Customer(name, eMail, phoneNumber, street, contract.time, contract));
-        //try {
+        try {
           //print(contract.name);
           var contractdb = await database!.query(
               'SELECT id,duracion_contrato FROM contratos WHERE nombre="${contract.name}" ');
@@ -187,13 +208,14 @@ class ApplicationController extends ChangeNotifier {
           //print(id_contract.runtimeType);
           //print(time_duration.runtimeType);
           await database!.query(
-              "INSERT INTO clientela (nombre,email,numero_telefonico,direccion,cp,id_contratos,tiempo_restante,dni) VALUES ('$name','$eMail','$phoneNumber','$street','54352','$id_contract','$time_duration','12345678l')");
+              "INSERT INTO clientela (nombre,email,numero_telefonico,direccion,cp,id_contratos,tiempo_restante,dni) VALUES ('$name','$eMail','$phoneNumber','$street','$cp','$id_contract','$time_duration','$dni')");
           alert(classContext!, "Saved", "the customer has been saved in database");
+          customers.add(Customer(await findNumberFromCustomerdb(name, eMail, phoneNumber), name, eMail, phoneNumber, street, contract.time, contract, dni, cp));
           return true;
-        //} catch (e) {
-          //alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
-          //return false;
-        //}
+        } catch (e) {
+          alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
+          return false;
+        }
       }else {
         alert(classContext!, "Not saved", "Insert a valid Email");
         return false;
@@ -259,20 +281,22 @@ class ApplicationController extends ChangeNotifier {
     }
 
     customer = Customer(
+        customerLocal['id'],
         customerLocal['nombre'],
         customerLocal['email'],
         customerLocal['numero_telefonico'],
         customerLocal['direccion'],
         TimeOfDay(hour: hours, minute: minutes),
-        contractTypes[customerLocal['id_contratos']]);
+        contractTypes[customerLocal['id_contratos']-1],
+        customerLocal['dni'],
+        customerLocal['cp'],);
 
     notifyListeners();
 
     return true;
   }
 
-  Future<int> findNumberFromCustomerdb(
-      String name, String eMail, String phone_number) async {
+  Future<int> findNumberFromCustomerdb(String name, String eMail, String phone_number) async {
     var customerid = await database!.query(
         "SELECT id FROM clientela WHERE nombre= '$name' AND email = '$eMail' AND numero_telefonico='$phone_number'");
 
