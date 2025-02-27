@@ -146,6 +146,7 @@ class ApplicationController extends ChangeNotifier {
         )
       );
     }
+    notifyListeners();
   }
 
   void pullContracts() async {

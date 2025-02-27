@@ -102,6 +102,7 @@ class customerView extends StatelessWidget{
   final customerSearchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: 
@@ -119,35 +120,86 @@ class customerView extends StatelessWidget{
       ),
       body: Column(
         children: [
-          Row(
-            children: [
-              TextFormField(controller: customerSearchController,),
-              ElevatedButton.icon(onPressed: () async {
-                  try {
-                    if (await customersController.findCustomerFromNumberdb(int.parse(customerSearchController.text))) {
-                      /*nombreController.text = customersController.customer!.name;
-                      emailController.text = customersController.customer!.eMail;
-                      numeroDeTelefonoController.text = customersController.customer!.phoneNumber;
-                      streetController.text = customersController.customer!.street;
-                      cpController.text = customersController.customer!.cp;
-                      dniController.text = customersController.customer!.dni;*/
-                    } else {
-                      customersController.customer = null;
-                      customersController.alert(
-                          context,
-                          "Error",
-                          "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
-                      nombreController.text = "";
-                      emailController.text = "";
-                      numeroDeTelefonoController.text = "";
-                      streetController.text = "";
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(child: ElevatedButton(onPressed: (){
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Nuevo cliente"), TextButton.icon(onPressed: (){Navigator.pop(context);}, label: Icon(Icons.close, size: 20,)), ],),
+                      content: SingleChildScrollView(
+                        child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [ 
+                          textfieldCustomer,
+                          Row(children: [
+                            Expanded(child: Text("Tipo de contrato: ", style: TextStyle(fontWeight: FontWeight.bold))),
+                            Expanded(
+                              child: 
+                              Padding(padding: EdgeInsets.all(10),child: DropdownMenu<String>(
+                                initialSelection: "-------",
+                                onSelected: (String? value) {
+                                  customersController.selectedContract = value!;
+                                },
+                                dropdownMenuEntries: customersController.contractTypes
+                                    .map<DropdownMenuEntry<String>>((ContractType value) {
+                                  return DropdownMenuEntry<String>(
+                                      value: value.name, label: value.name);
+                                }).toList(),
+                              ),)
+                              
+                            ),
+                          ]),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(0,10,0,0),
+                            child: ElevatedButton(onPressed: (){
+                              Navigator.pop(context);
+                              customersController.addCustomer(
+                              nombreController.text,
+                              emailController.text,
+                              numeroDeTelefonoController.text,
+                              streetController.text, cpController.text, dniController.text);
+                            }, child: Icon(Icons.save)),
+                          )
+                        ],
+                      ),
+                    )));
+                }, child: Icon(Icons.add_box_outlined)),),
+                Expanded(flex: 3,child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(controller: customerSearchController,),
+                )),
+                ElevatedButton.icon(onPressed: () async {
+                    try {
+                      if (await customersController.findCustomerFromNumberdb(int.parse(customerSearchController.text))) {
+                        /*nombreController.text = customersController.customer!.name;
+                        emailController.text = customersController.customer!.eMail;
+                        numeroDeTelefonoController.text = customersController.customer!.phoneNumber;
+                        streetController.text = customersController.customer!.street;
+                        cpController.text = customersController.customer!.cp;
+                        dniController.text = customersController.customer!.dni;*/
+                      } else {
+                        customersController.customer = null;
+                        customersController.alert(
+                            context,
+                            "Error",
+                            "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
+                        nombreController.text = "";
+                        emailController.text = "";
+                        numeroDeTelefonoController.text = "";
+                        streetController.text = "";
+                      }
+                    } catch (e) {
+                      customerNumberController.text="write customer number";
+                      customersController.notifyListenersLocal();
                     }
-                  } catch (e) {
-                    customerNumberController.text="write customer number";
-                    customersController.notifyListenersLocal();
-                  }
-              }, label: Icon(Icons.search))
-            ],
+                }, label: Icon(Icons.search))
+              ],
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -232,16 +284,16 @@ class customerView extends StatelessWidget{
                               showDialog<String>(
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
-                                  title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Editor"), TextButton.icon(onPressed: (){Navigator.pop(context);}, label: Icon(Icons.close, size: 20,)), ],),
+                                  title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Editar cliente"), TextButton.icon(onPressed: (){Navigator.pop(context);}, label: Icon(Icons.close, size: 20,)), ],),
                                   content: SingleChildScrollView(
                                     child:Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [ 
                                       textfieldCustomer,
                                       Container(
                                         padding: EdgeInsets.fromLTRB(0,10,0,0),
                                         child: ElevatedButton(onPressed: (){
-                                          Navigator.pop(context);
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                           customersController.upgradeData(
@@ -281,179 +333,65 @@ final cpController = TextEditingController();
 final dniController = TextEditingController();
 /// this variable contains the graphic part of the textField
 Widget textfieldCustomer = 
-            Column(
-              children: [
-                Row(children: [
-                  Text("nombre: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: nombreController,
-                    ),
-                  ),
-                ]),
-                Row(children: [
-                  Text("número telefónico: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: numeroDeTelefonoController,
-                    ),
-                  ),
-                ]),
-                Row(children: [
-                  Text("e-Mail: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: emailController,
-                    ),
-                  ),
-                ]),
-                Row(children: [
-                  Text("Direccion: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: streetController,
-                    ),
-                  ),
-                ]),
-                Row(children: [
-                  Text("Còdigo Postal: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: cpController,
-                    ),
-                  ),
-                ]),
-                Row(children: [
-                  Text("DNI: "),
-                  Expanded(
-                    child: TextFormField(
-                      controller: dniController,
-                    ),
-                  ),
-                ]),
-              ],
-            );
-              
-class addCustomer extends StatelessWidget{
-  var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-
-   Widget build(BuildContext context) {
-    Widget graphicPartContract = Row(children: [
-      Expanded(child: Text("seleccione un tipo de contrato: ")),
-      Expanded(
-        child: DropdownMenu<String>(
-          initialSelection: "-------",
-          onSelected: (String? value) {
-            customersController.selectedContract = value!;
-          },
-          dropdownMenuEntries: customersController.contractTypes
-              .map<DropdownMenuEntry<String>>((ContractType value) {
-            return DropdownMenuEntry<String>(
-                value: value.name, label: value.name);
-          }).toList(),
-        ),
-      ),
-    ]);
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: 
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            tileMode: TileMode.clamp,
-            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+  Column(
+    children: [
+      Row(children: [
+        Text("nombre: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            controller: nombreController,
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-        title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
-      ),
-      body: Container(
-        color: const Color.fromARGB(255, 123, 168, 204),
-        height: 500,
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                "Informationes de cliente",
-                style: sectionTitle,
-              ),
-              textfieldCustomer,
-              Container(
-                  child: customersController.customer == null
-                      ? graphicPartContract
-                      : null),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Expanded(
-                  flex: 3,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (customersController.customer != null) {
-                        customersController.upgradeData(
-                          int.parse(customerNumberController.text),
-                          nombreController.text,
-                          emailController.text,
-                          numeroDeTelefonoController.text,
-                          streetController.text,cpController.text,dniController.text);
-                      } else{
-                        if(await customersController.addCustomer(
-                          nombreController.text,
-                          emailController.text,
-                          numeroDeTelefonoController.text,
-                          streetController.text,cpController.text,dniController.text)){
-                            nombreController.text = "";
-                            emailController.text = "";
-                            numeroDeTelefonoController.text = "";
-                            streetController.text = "";
-                            cpController.text = "";
-                            dniController.text = "";
-                          }
-                      }
-                    },
-                    child: Text(customersController.customer != null
-                        ? "UPGRADE"
-                        : "SAVE")
-                    ),
-                ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(10,0,0,0),
-                  child:
-                  customersController.customer != null ? 
-                  ElevatedButton(
-                    onPressed: (){
-                      customersController.customer=null;
-                      nombreController.text = "";
-                      emailController.text = "";
-                      numeroDeTelefonoController.text = "";
-                      streetController.text = "";
-                      cpController.text = "";
-                      dniController.text = "";
-                      customersController.notifyListenersLocal();
-                    }, 
-                    child: Icon(
-                      Icons.add_circle_outline_sharp,
-                      color: Colors.blueGrey,
-                      size: 24.0,
-                      semanticLabel: 'add a new customers',
-                    ),
-                  ) : null
-                ),
-              ],
-              ),
-            ],
+      ]),
+      Row(children: [
+        Text("número telefónico: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            keyboardType: TextInputType.phone,
+            controller: numeroDeTelefonoController,
           ),
-        )
-      ),
-    );
-   }
-}
+        ),
+      ]),
+      Row(children: [
+        Text("e-Mail: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            controller: emailController,
+          ),
+        ),
+      ]),
+      Row(children: [
+        Text("Direccion: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            controller: streetController,
+          ),
+        ),
+      ]),
+      Row(children: [
+        Text("Còdigo Postal: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            keyboardType: TextInputType.number,
+            controller: cpController,
+          ),
+        ),
+      ]),
+      Row(children: [
+        Text("DNI: ", style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: TextFormField(
+            controller: dniController,
+          ),
+        ),
+      ]),
+    ],
+  );
 
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { casa, tienda }
+
 class BuenoDeHoras extends StatelessWidget {
   var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   var signTextSyle = TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
@@ -469,6 +407,7 @@ class BuenoDeHoras extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
     Widget graphicPartContract = Row(children: [
       Expanded(child: Text("seleccione un tipo de contrato: ")),
       Expanded(
@@ -750,6 +689,7 @@ class BuenoDeHoras extends StatelessWidget {
               )
             ],
           ),
-        ));
-  }
+        )
+      );
+   }
 }
