@@ -4,23 +4,24 @@ import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
 
 class Customer {
+  int _id;
   String _name;
   String? _eMail;
   String _phoneNumber;
-  String _street; //where the customer live
-  ContractType _contractType; //the type of contract the customers bougth
-  TimeOfDay _remainingContractTime; //time left
-  String dni;
-  String cp;
-  int id;
-  Customer(this.id, this._name, this._eMail, this._phoneNumber, this._street,
-      this._remainingContractTime, this._contractType, this.dni, this.cp);
-  get eMail => _eMail;
-  get name => _name;
-  get phoneNumber => _phoneNumber;
-  get street => _street;
-  get contractType => _contractType;
-  get remainingContractTime => _remainingContractTime;
+  String _street; //Where the customer live
+  ContractType _contractType; //The type of contract the customers bougth
+  TimeOfDay _remainingContractTime; //Remaining contract time for the customer
+  String _dni;
+  String _cp;
+
+  //BUILDER
+  Customer(this._id, this._name, this._eMail, this._phoneNumber, this._street,this._remainingContractTime, 
+    this._contractType, this._dni, this._cp);
+  
+  //SETTER
+  void setId(int id) {
+    _id = id;
+  }
 
   void setName(String name) {
     _name = name;
@@ -42,6 +43,27 @@ class Customer {
     _contractType = contractType;
   }
 
+  void setCP(String cp) {
+    _cp = cp;
+  }
+
+  void setDNI(String dni) {
+    _dni = dni;
+  }
+
+  //GETTER
+  get id => _id;
+  get name => _name;
+  get eMail => _eMail;  
+  get phoneNumber => _phoneNumber;
+  get street => _street;
+  get contractType => _contractType;
+  get remainingContractTime => _remainingContractTime;
+  get dni => _dni;
+  get cp => _cp;
+
+  //METHODS
+  //This method returns the remaining time of the customer in string for it to be shown in the graphic part
   String remainingContractTimeStr() {
     return ApplicationController.timeInString(
         _remainingContractTime.hour, _remainingContractTime.minute);
@@ -51,7 +73,11 @@ class Customer {
 class ContractType {
   String _name;
   TimeOfDay _time;
+  
+  //BUILDER
   ContractType(this._name, this._time);
+  
+  //SETTER
   void setName(String name) {
     _name = name;
   }
@@ -60,50 +86,74 @@ class ContractType {
     _time = time;
   }
 
+  //GETTER
   String get name => _name;
   TimeOfDay get time => _time;
 }
 
 class ApplicationController extends ChangeNotifier {
-  Customer? customer;
-  BuildContext? classContext;
-  bool connectionStatus = false;
+  //Array of contracts. The contracts doesn't change 
   final List<ContractType> contractTypes = <ContractType>[];
+  
+  //Array of Costumer
   List<Customer> customers = [];
-  String IPaddress = "192.168.0.146";
+  //Costumer
+  Customer? customer;
+
+  BuildContext? classContext;
+  bool connectionStatus = false; //To track the status of the connection
+  // ignore: non_constant_identifier_names
+  String IPaddress = "192.168.0.146"; //The IP address of the computer where there is the mariaDB server
+  MySqlConnection? database;
+  String selectedContract = "";
+
   
   //------------------------------------------ notifyListeners();
+  //Need this to update the graphic called by the interfaces
   void notifyListenersLocal(){
     notifyListeners();
   }
 
-  //------------------------------------------ usefull metods to comunicate with the db
-  MySqlConnection? database;
+  //------------------------------------------ methods for the query
   void connectionDb() async {
+
     final conn = ConnectionSettings(
-      host: IPaddress, // Add your host IP address or server name
-      port: 3306, // Add the port the server is running on
-      user: "tablet", // Your username
-      password: "T3cn1c0@2025", // Your password
-      db: "divermatica", // Your DataBase name
+      host: IPaddress, // The IP address where you are connecting
+      port: 3306, // Add the port of the socket(normally for the database it should be 3306)
+      user: "tablet", // Your username on the DB
+      password: "T3cn1c0@2025", // Your password on the DB
+      db: "divermatica", // The name of the DataBase
     );
-    //chargingdDb(classContext!);
-    Timer(const Duration(seconds: 10), (){
-      if (database==null) {
-        connectionStatus=true;
-        notifyListeners();
-        //alert(classContext!, "database error",
-        //"database connection failed, check the wifi or the database status. \n Restart the application.");
-        showDialog<String>(
-        context: classContext!,
-        builder: (BuildContext context) => AlertDialog(
-          title: Text("database error"),
-          content: Text("database connection failed, check the wifi or the database status. \n Restart the application."),
-          ),
-        );
-        Timer(const Duration(seconds: 5), (){SystemNavigator.pop();});
+
+    //It will be called in 10 seconds while we are tryng to connect to the database. 
+    //This permits to the user to restart or close the application if he can't connect to the database
+    Timer(
+      const Duration(seconds: 10), (){
+        if (database==null) {
+          connectionStatus=true;
+
+          notifyListeners();
+
+          showDialog<String>(
+          context: classContext!,
+          builder: (BuildContext context) => AlertDialog(
+            title: Text("Database Error"),
+            content: Text("Database connection failed, check the wifi or the database status.\nRestart the application."),
+            ),
+          );
+
+          //This closes the application
+          Timer(
+            const Duration(seconds: 5), (){
+              SystemNavigator.pop();
+            }
+          );
+
+        }
       }
-    });
+    );
+
+
     while(!connectionStatus){
       try {
         database = await MySqlConnection.connect(conn);
@@ -111,8 +161,6 @@ class ApplicationController extends ChangeNotifier {
         pullContracts();
         pullCustomers();
         notifyListeners();
-        //Navigator.of(classContext!).pop();
-        //print("interface closed");
       } catch (e) {
         database=null;
         connectionStatus = false;
@@ -120,19 +168,22 @@ class ApplicationController extends ChangeNotifier {
     }
   }
   
-  /// in this method the customers are taken from the database and saved inside the "customers" vector
+  //This method takes the customers from the database and saves them inside the "customers" vector
   void pullCustomers() async {
-    var result = await database!.query('SELECT * FROM clientela');
-    //pullContracts();
-    customers.clear();
-    for (var customerDB in result) {
+    customers.clear();//Clearing the array
+
+    var result = await database!.query('SELECT * FROM clientela'); //Query
+
+    for (var customerDB in result) { //It fills the costumer array
       Duration time = customerDB['tiempo_restante'];
       int minutes = time.inMinutes;
       int hours = 0;
+
       if (minutes >= 60) {
         hours = (minutes / 60).toInt();
         minutes = minutes - hours * 60;
       }
+
       customers.add(Customer(
           customerDB['id'],
           customerDB['nombre'],
@@ -146,129 +197,101 @@ class ApplicationController extends ChangeNotifier {
         )
       );
     }
+
     notifyListeners();
   }
 
   void pullContracts() async {
-    var result = await database!.query('SELECT * FROM contratos');
-    contractTypes.clear();
+    contractTypes.clear(); //Clearing the array
+
+    var result = await database!.query('SELECT * FROM contratos'); //Query
+
     for (var contract in result) {
+      
       Duration time = contract['duracion_contrato'];
       int minutes = time.inMinutes;
       int hours = 0;
+      
       if (minutes >= 60) {
         hours = (minutes / 60).toInt();
         minutes = minutes - hours * 60;
       }
+      
       contractTypes.add(ContractType(
-          contract['nombre'], TimeOfDay(hour: hours, minute: minutes)));
+          contract['nombre'], 
+          TimeOfDay(hour: hours, minute: minutes)
+        )
+      );
     }
+
     notifyListeners();
   }
 
-  String selectedContract = "";
-
+  //Upgrades the customer in the database
   void upgradeData(int index, String name, String eMail, String phoneNumber,String street,String cp,String dni) async {
-    if (eMail.contains('@')) {
-      try {
-        await database!.query(
-            "UPDATE clientela SET nombre = '$name', email='$eMail', numero_telefonico='$phoneNumber', direccion='$street', cp='$cp', dni='$dni' WHERE id = $index ");
-        alert(classContext!, "Upgraded", "The customer has been upgraded");
-      } catch (e) {
-        alert(classContext!, "Error", "check if the data are correct or check the connection to database.");
-      }
-      pullCustomers();
+    
+    try {
+      await database!.query(
+          "UPDATE clientela SET nombre = '$name', email='$eMail', numero_telefonico='$phoneNumber', direccion='$street', cp='$cp', dni='$dni' WHERE id = $index; ");
+      alert(classContext!, "Upgraded", "The customer has been upgraded.");
+    }catch (e) {
+      alert(classContext!, "Something went wrong...", "check if the data are correct or check the connection to the database.");
     }
+    pullCustomers();
+
     notifyListeners();
-    /*try {
-      customers[index].setName(name);
-      customers[index].setEmail(eMail);
-      customers[index].setPhoneNumber(phoneNumber);
-      customers[index].setStreet(street);
-    } catch (e) {
-    }*/
+  
   }
 
+  //Adds a customer to the database
   Future<bool> addCustomer(String name, String eMail, String phoneNumber, String street,String cp,String dni) async {
     ContractType? contract;
+
     if (selectedContract != "") {
       for (int i = 0; i < contractTypes.length; i++) {
         if (selectedContract == contractTypes[i].name) {
           contract = contractTypes[i];
-          break;
+          try {
+            var contractdb = await database!.query(
+                'SELECT id,duracion_contrato FROM contratos WHERE nombre="${contract.name}" ');
+
+            var idContract = contractdb.toList().first['id'];
+            var timeDuration = contractdb.toList().first['duracion_contrato'];
+            
+            await database!.query(
+                "INSERT INTO clientela (nombre,email,numero_telefonico,direccion,cp,id_contratos,tiempo_restante,dni) VALUES ('$name','$eMail','$phoneNumber','$street','$cp','$idContract','$timeDuration','$dni')");
+            
+            alert(classContext!, "Saved", "The customer has been saved in the database.");
+            
+            customers.add(Customer(await findNumberFromCustomerdb(name, eMail, phoneNumber), name, eMail, phoneNumber, street, contract.time, contract, dni, cp));
+            
+            selectedContract == "";
+            pullCustomers();
+            notifyListeners();
+
+            return true;
+          } catch (e) {
+            alert(classContext!, "Not saved", "The customer hasn't been saved in the database. Check if you inserted the information right. ");
+            return false;
+          }
         }
-      }
-      if (contract != null && eMail.contains('@')) {
-        try {
-          //print(contract.name);
-          var contractdb = await database!.query(
-              'SELECT id,duracion_contrato FROM contratos WHERE nombre="${contract.name}" ');
-          //print(id_contract.toList().first['id']);
-          var id_contract = contractdb.toList().first['id'];
-          var time_duration = contractdb.toList().first['duracion_contrato'];
-          //print(id_contract.runtimeType);
-          //print(time_duration.runtimeType);
-          await database!.query(
-              "INSERT INTO clientela (nombre,email,numero_telefonico,direccion,cp,id_contratos,tiempo_restante,dni) VALUES ('$name','$eMail','$phoneNumber','$street','$cp','$id_contract','$time_duration','$dni')");
-          alert(classContext!, "Saved", "the customer has been saved in database");
-          customers.add(Customer(await findNumberFromCustomerdb(name, eMail, phoneNumber), name, eMail, phoneNumber, street, contract.time, contract, dni, cp));
-          return true;
-        } catch (e) {
-          alert(classContext!, "Not saved", "the customer hasn't been saved in database.");
-          return false;
-        }
-      }else {
-        alert(classContext!, "Not saved", "Insert a valid Email");
-        return false;
       }
     }else{
-      alert(classContext!, "Not saved", "Select a contract");
+      alert(classContext!, "Not saved", "Select a contract.");
       return false;
     }
-  }
-
-//--------------------------------------------------------- control the alert parts
-  void alert(BuildContext context, String title, String description) {
-    showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text(title),
-        content: Text(description),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-//--------------------------------------------------------- part to find the customer from his number
-  //the customer number is the corresponding index in the vector "customers"
-  bool findNumberCustomer(String indexStr) {
-    customer = null;
-    notifyListeners();
-    try {
-      int index = int.parse(indexStr);
-      try {
-        customer = customers[index];
-        notifyListeners();
-        return true;
-      } catch (e) {}
-    } catch (e) {}
-    notifyListeners();
     return false;
   }
 
+//--------------------------------------------------------- Methods for the searching query
   Future<bool> findCustomerFromNumberdb(int index) async {
     Results customerdb;
-    var customerLocal;
+    ResultRow customerLocal;
     try {
       customerdb = await database!.query("SELECT * FROM clientela WHERE id='$index'");
       customerLocal = customerdb.toList().first;
     } catch (e) {
-      this.customer=null;
+      customer=null;
       notifyListeners();
       return false;
     }
@@ -290,23 +313,119 @@ class ApplicationController extends ChangeNotifier {
         TimeOfDay(hour: hours, minute: minutes),
         contractTypes[customerLocal['id_contratos']-1],
         customerLocal['dni'],
-        customerLocal['cp'],);
+        customerLocal['cp']
+    );
 
     notifyListeners();
 
     return true;
   }
 
-  Future<int> findNumberFromCustomerdb(String name, String eMail, String phone_number) async {
-    var customerid = await database!.query(
-        "SELECT id FROM clientela WHERE nombre= '$name' AND email = '$eMail' AND numero_telefonico='$phone_number'");
+  Future<bool> pullCustomersFromName(String name) async {
+    customers.clear();//Clearing the array
 
-    print(customerid.toList().first['id']);
+    var result = await database!.query("SELECT * FROM clientela WHERE nombre='$name';"); //Query
+    if(result.isNotEmpty){
+      for (var customerDB in result) { //It fills the costumer array
+        Duration time = customerDB['tiempo_restante'];
+        int minutes = time.inMinutes;
+        int hours = 0;
+
+        if (minutes >= 60) {
+          hours = (minutes / 60).toInt();
+          minutes = minutes - hours * 60;
+        }
+
+        customers.add(Customer(
+            customerDB['id'],
+            customerDB['nombre'],
+            customerDB['email'],
+            customerDB['numero_telefonico'],
+            customerDB['direccion'],
+            TimeOfDay(hour: hours, minute: minutes),
+            contractTypes[customerDB['id_contratos']-1],
+            customerDB['dni'],
+            customerDB['cp'],
+          )
+        );
+      }
+      notifyListeners();
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+    Future<bool> pullCustomersFromPhoneNumber(String phoneNumber) async {
+    customers.clear();//Clearing the array
+
+    var result = await database!.query("SELECT * FROM clientela WHERE numero_telefonico='$phoneNumber';"); //Query
+
+    for (var customerDB in result) { //It fills the costumer array
+      Duration time = customerDB['tiempo_restante'];
+      int minutes = time.inMinutes;
+      int hours = 0;
+
+      if (minutes >= 60) {
+        hours = (minutes / 60).toInt();
+        minutes = minutes - hours * 60;
+      }
+
+      customers.add(Customer(
+          customerDB['id'],
+          customerDB['nombre'],
+          customerDB['email'],
+          customerDB['numero_telefonico'],
+          customerDB['direccion'],
+          TimeOfDay(hour: hours, minute: minutes),
+          contractTypes[customerDB['id_contratos']-1],
+          customerDB['dni'],
+          customerDB['cp'],
+        )
+      );
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  Future<int> findNumberFromCustomerdb(String name, String eMail, String phoneNumber) async {
+    var customerid = await database!.query(
+        "SELECT id FROM clientela WHERE nombre= '$name' AND email = '$eMail' AND numero_telefonico='$phoneNumber'");
+
+    //print(customerid.toList().first['id']);
 
     return customerid.toList().first['id'];
   }
 
-//--------------------------------------------------------- part to edit the hours remain
+  
+
+//--------------------------------------------------------- Control the alert parts
+  void alert(BuildContext context, String title, String description) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(title),
+        content: Text(description),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+//--------------------------------------------------------- part to check the selected radiobutton
+  bool? _serviceInShop;
+  void serviceInShop(bool value) {
+    _serviceInShop = value;
+    notifyListeners();
+  }
+
+//--------------------------------------------------------- part to control the time
   Future<bool> removeHours(int index) async {
     TimeOfDay remainingTime = customer!.remainingContractTime;
     TimeOfDay timeToRemove = workHoursContadas();
@@ -331,10 +450,10 @@ class ApplicationController extends ChangeNotifier {
     }
 
     var time = TimeOfDay(hour: hours, minute: minutes);
-    Duration time_duration = Duration(hours: time.hour, minutes: time.minute);
+    Duration timeDuration = Duration(hours: time.hour, minutes: time.minute);
     try {
       await database!.query(
-          "UPDATE clientela SET tiempo_restante='$time_duration' WHERE id = $index");
+          "UPDATE clientela SET tiempo_restante='$timeDuration' WHERE id = $index");
     } catch (e) {
       alert(classContext!, "Error", "an error occured changing the time");
       return false;
@@ -345,14 +464,6 @@ class ApplicationController extends ChangeNotifier {
     return true;
   }
 
-//--------------------------------------------------------- part to check the selected radiobutton
-  bool? _serviceInShop;
-  void serviceInShop(bool value) {
-    _serviceInShop = value;
-    notifyListeners();
-  }
-
-//--------------------------------------------------------- part to control the time
   TimeOfDay _startTime = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _endTime = TimeOfDay(hour: 0, minute: 0);
 

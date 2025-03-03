@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_request_application/classes.dart';
 import 'package:signature/signature.dart';
 
 late ApplicationController customersController;
-///-------------------------------- class with the interface for the menu
+///--------------------------------Class with the interface for the menu
 class Menu extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
@@ -100,6 +99,7 @@ class Menu extends StatelessWidget{
 ///-------------------------------- class with the interface to control the customers
 class customerView extends StatelessWidget{
   final customerSearchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     customersController = context.watch<ApplicationController>();
@@ -163,40 +163,46 @@ class customerView extends StatelessWidget{
                               emailController.text,
                               numeroDeTelefonoController.text,
                               streetController.text, cpController.text, dniController.text);
+                              customersController.selectedContract = "";
                             }, child: Icon(Icons.save)),
                           )
                         ],
                       ),
                     )));
                 }, child: Icon(Icons.add_box_outlined)),),
+                
                 Expanded(flex: 3,child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(controller: customerSearchController,),
+                  child: TextFormField(
+                    controller: customerSearchController,
+                    decoration: InputDecoration(
+                        hintText: 'Buscar por nombre o numero telefonico...',
+                        hintStyle: TextStyle(
+                          fontStyle: FontStyle.italic, //Italic style
+                        ),
+                    ),
+                  ),
                 )),
                 ElevatedButton.icon(onPressed: () async {
-                    try {
-                      if (await customersController.findCustomerFromNumberdb(int.parse(customerSearchController.text))) {
-                        /*nombreController.text = customersController.customer!.name;
-                        emailController.text = customersController.customer!.eMail;
-                        numeroDeTelefonoController.text = customersController.customer!.phoneNumber;
-                        streetController.text = customersController.customer!.street;
-                        cpController.text = customersController.customer!.cp;
-                        dniController.text = customersController.customer!.dni;*/
-                      } else {
-                        customersController.customer = null;
-                        customersController.alert(
-                            context,
-                            "Error",
-                            "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
-                        nombreController.text = "";
-                        emailController.text = "";
-                        numeroDeTelefonoController.text = "";
-                        streetController.text = "";
-                      }
-                    } catch (e) {
-                      customerNumberController.text="write customer number";
-                      customersController.notifyListenersLocal();
-                    }
+                  var tmp = false;
+                  if(customerSearchController.text.contains(RegExp(r'\d'))){
+                    tmp = await customersController.pullCustomersFromPhoneNumber(customerSearchController.text);
+                  }else if(customerSearchController.text.contains(RegExp(r'[a-zA-Z]'))){
+                    tmp = await customersController.pullCustomersFromName(customerSearchController.text);
+                  }else{
+                    customersController.pullCustomers();
+                    tmp=true;
+                  }
+                  if(!tmp){
+                    customersController.alert(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      "Error",
+                      "The customer doesn't exist. Check the data you inserted. "
+                    );
+                    customerSearchController.text = "";
+                    customersController.pullCustomers();
+                  }
                 }, label: Icon(Icons.search))
               ],
             ),
@@ -284,7 +290,7 @@ class customerView extends StatelessWidget{
                               showDialog<String>(
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
-                                  title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Editar cliente"), TextButton.icon(onPressed: (){Navigator.pop(context);}, label: Icon(Icons.close, size: 20,)), ],),
+                                  title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Editar cliente"), TextButton.icon(onPressed: (){Navigator.pop(context);cleanTextField();}, label: Icon(Icons.close, size: 20,)), ],),
                                   content: SingleChildScrollView(
                                     child:Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -302,6 +308,7 @@ class customerView extends StatelessWidget{
                                           emailController.text,
                                           numeroDeTelefonoController.text,
                                           streetController.text, cpController.text, dniController.text);
+                                          cleanTextField();
                                         }, child: Icon(Icons.save)),
                                       )
                                     ],
@@ -324,7 +331,7 @@ class customerView extends StatelessWidget{
   }
 }
 
-final customerNumberController = TextEditingController();
+final customerSearchController = TextEditingController();
 final streetController = TextEditingController();
 final nombreController = TextEditingController();
 final numeroDeTelefonoController = TextEditingController();
@@ -389,42 +396,30 @@ Widget textfieldCustomer =
     ],
   );
 
+void cleanTextField(){
+  nombreController.text = "";
+  emailController.text = "";
+  numeroDeTelefonoController.text = "";
+  streetController.text = "";
+  cpController.text = "";
+  dniController.text = "";
+}
+
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { casa, tienda }
 
 class BuenoDeHoras extends StatelessWidget {
-  var sectionTitle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-  var signTextSyle = TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
-  final customerNumberController = TextEditingController();
+  
+  final customerSearchController = TextEditingController();
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
-  final streetController = TextEditingController();
-  final nombreController = TextEditingController();
-  final numeroDeTelefonoController = TextEditingController();
-  final emailController = TextEditingController();
-  TextStyle styleTextSearchField=TextStyle(color: Colors.black);
+  
   SingingCharacter? radioButtonSelection;
 
   @override
   Widget build(BuildContext context) {
     customersController = context.watch<ApplicationController>();
-    Widget graphicPartContract = Row(children: [
-      Expanded(child: Text("seleccione un tipo de contrato: ")),
-      Expanded(
-        child: DropdownMenu<String>(
-          initialSelection: "-------",
-          onSelected: (String? value) {
-            customersController.selectedContract = value!;
-          },
-          dropdownMenuEntries: customersController.contractTypes
-              .map<DropdownMenuEntry<String>>((ContractType value) {
-            return DropdownMenuEntry<String>(
-                value: value.name, label: value.name);
-          }).toList(),
-        ),
-      ),
-    ]);
-
+    //The canvas for the customer signature
     final SignatureController controllerCustomers = SignatureController(
       penStrokeWidth: 2,
       penColor: Colors.black,
@@ -434,10 +429,10 @@ class BuenoDeHoras extends StatelessWidget {
       controller: controllerCustomers,
       width: 500,
       height: 250,
-      
       backgroundColor: Colors.white,
     );
 
+    //The canvas for the SAT signature
     final SignatureController controllerSAT = SignatureController(
       penStrokeWidth: 2,
       penColor: Colors.black,
@@ -469,62 +464,55 @@ class BuenoDeHoras extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                  color: const Color.fromARGB(255, 123, 168, 204),
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   height: 350,
                   child: Container(
                     padding: EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          "contrato de cliente",
-                          style: sectionTitle,
+                        Text("Contrato de cliente",
+                          style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         Row(
                           children: [
-                            Expanded(child: Text("Número de cliente")),
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: TextFormField(
-                                style: styleTextSearchField,
-                                controller: customerNumberController,
+                                style: TextStyle(color: Colors.black),
+                                controller: customerSearchController,
+                                decoration: InputDecoration(
+                                    hintText: 'Buscar al cliente por nombre o numero telefonico...',
+                                    hintStyle: TextStyle(
+                                      fontStyle: FontStyle.italic, //Italic style
+                                    ),
+                                ),
                               ),
                             ),
                             Expanded(
                               child: ElevatedButton(
                                   onPressed: () async {
-                                    try {
-                                      styleTextSearchField=TextStyle(color: Colors.black);
-                                      if (await customersController.findCustomerFromNumberdb(
-                                        int.parse(customerNumberController.text))) {
-                                        nombreController.text =
-                                            customersController.customer!.name;
-                                        emailController.text =
-                                            customersController.customer!.eMail;
-                                        numeroDeTelefonoController.text =
-                                            customersController
-                                                .customer!.phoneNumber;
-                                        streetController.text =
-                                            customersController
-                                                .customer!.street;
-                                      } else {
-                                        customersController.customer = null;
-                                        customersController.alert(
-                                            context,
-                                            "Error",
-                                            "The customer doesn't exist. To create it fill the information and save or update data. Remember the client number is composed just by number.");
-                                        nombreController.text = "";
-                                        emailController.text = "";
-                                        numeroDeTelefonoController.text = "";
-                                        streetController.text = "";
-                                      }
-                                    } catch (e) {
-                                      styleTextSearchField=TextStyle(color: Colors.red, fontWeight: FontWeight.bold);
-                                      customerNumberController.text="write customer number";
-                                      customersController.notifyListenersLocal();
+                                    var tmp = false;
+                                    if(customerSearchController.text.contains(RegExp(r'\d'))){
+                                      tmp = await customersController.pullCustomersFromPhoneNumber(customerSearchController.text);
+                                    }else if(customerSearchController.text.contains(RegExp(r'[a-zA-Z]'))){
+                                      tmp = await customersController.pullCustomersFromName(customerSearchController.text);
+                                    }else{
+                                      customersController.pullCustomers();
+                                      tmp=true;
                                     }
-                                  },
-                                child: Text("search")),
+                                    if(!tmp){
+                                      customersController.alert(
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        "Error",
+                                        "The customer doesn't exist. Check the data you inserted. "
+                                      );
+                                      customerSearchController.text = "";
+                                      customersController.pullCustomers();
+                                    }
+                                  },child: Icon(Icons.search)
+                                ),
                             )
                           ],
                         ),
@@ -533,11 +521,11 @@ class BuenoDeHoras extends StatelessWidget {
                           child: Row(
                             children: [
                               Expanded(
-                                  child: Text(
-                                      "tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType.name : ""}")),
+                                child: Text(
+                                  "Tipo de contrato: ${customersController.customer != null ? customersController.customer!.contractType.name : ""}")),
                               Expanded(
                                 child: Text(
-                                  "horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
+                                  "Horas restantes: ${customersController.customer != null ? customersController.customer!.remainingContractTimeStr() : ""}",
                                   style: customersController.customer != null && customersController.customer!.remainingContractTime.hour == 0 && customersController.customer!.remainingContractTime.minute == 0
                                       ? TextStyle(
                                           color: Colors.red,
@@ -548,7 +536,7 @@ class BuenoDeHoras extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text("tipo de asistencia"),
+                        Text("Tipo de asistencia"),
                         Row(
                           children: [
                             Expanded(
@@ -607,9 +595,9 @@ class BuenoDeHoras extends StatelessWidget {
                             Expanded(
                                 child: Column(children: [
                               Text(
-                                  "horas de trabajo reales: ${customersController.workHoursString()}"),
+                                  "Horas de trabajo reales: ${customersController.workHoursString()}"),
                               Text(
-                                  "horas de trabajo contadas: ${customersController.workHoursStringContadas()}")
+                                  "Horas de trabajo contadas: ${customersController.workHoursStringContadas()}")
                             ]))
                           ],
                         ),
@@ -620,29 +608,25 @@ class BuenoDeHoras extends StatelessWidget {
                                 flex: 2,
                                 child: ElevatedButton(
                                     onPressed: () async {
-                                      if (customersController.customer !=
-                                          null) {
-                                        if (await customersController
-                                            .removeHours(int.parse(
-                                                customerNumberController
-                                                    .text))) {
-                                          customersController.alert(context,
-                                              "Saved", "tiempo ahorrado");
+                                      if (customersController.customer != null) {
+                                        if (await customersController.removeHours(int.parse(customerSearchController.text))) {
+                                          customersController.alert(context,"Saved", "time updated");
                                         }
                                       } else {
-                                        customersController.alert(
-                                            context,
-                                            "Error",
-                                            "introduzca un numero de cliente");
+                                        customersController.alert(context, "Error", "insert something...");
                                       }
                                     },
-                                    child: Text("Save"))),
-                            Spacer(),
-                            Expanded(
+                                    child: Text("Save")
+                                  )
+                            ),
+                            //Spacer(),
+                            /*Expanded(
                                 flex: 2,
                                 child: ElevatedButton(
                                     onPressed: () {},
-                                    child: Text("View Data"))),
+                                    child: Text("View Data")
+                                  )
+                            ),*/
                           ],
                         )
                       ],
@@ -659,13 +643,13 @@ class BuenoDeHoras extends StatelessWidget {
                       children: [
                         Text(
                           "Firma SAT",
-                          style: signTextSyle,
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         ElevatedButton(
                             onPressed: () {
                               controllerSAT.clear();
                             },
-                            child: Text("clean"))
+                            child: Text("Clean"))
                       ],
                     ),
                     signatureCanvasSAT,
@@ -674,13 +658,13 @@ class BuenoDeHoras extends StatelessWidget {
                       children: [
                         Text(
                           "Firma Cliente",
-                          style: signTextSyle,
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         ElevatedButton(
                             onPressed: () {
                               controllerCustomers.clear();
                             },
-                            child: Text("clean")),
+                            child: Text("Clean")),
                       ],
                     ),
                     signatureCanvasCustomers,
