@@ -45,7 +45,7 @@ class Menu extends StatelessWidget{
                   }, child: Text("Lista de cliente")
                 ),
               ),
-              SizedBox(
+              /*SizedBox(
                 width: 300,
                 height: 75,
                 child: ElevatedButton(
@@ -55,7 +55,7 @@ class Menu extends StatelessWidget{
                     }));
                   }, child: Text("Bonus de horas")
                 ),
-              ),
+              ),*/
               SizedBox(
                 width: 300,
                 height: 75,
@@ -213,9 +213,14 @@ class customerView extends StatelessWidget{
                 return Card(
                   child: ListTile(
                     tileColor: const Color.fromARGB(255, 184, 223, 255),
+                    leading: Icon(
+                      customersController.isActive(customersController.customers[index].id) // Verifica se il cliente è attivo
+                          ? Icons.check_circle_outline_outlined  // Se la condizione è vera
+                          : Icons.cancel_outlined,  // Se la condizione è falsa
+                    ),
                     title: Text(customersController.customers[index].name),
                     subtitle: Text(customersController.customers[index].dni),
-                    trailing: Icon(Icons.arrow_forward_ios_rounded),//Icons.arrow_circle_right_outlined
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),//other icon (Icons.arrow_circle_right_outlined)
                     onTap:() {
                       showDialog<String>(
                       context: context,
@@ -271,50 +276,90 @@ class customerView extends StatelessWidget{
                                 Text(customersController.customers[index].dni),
                               ],
                             ),
-                            ElevatedButton(onPressed: ()async{  
-                              if (await customersController.findCustomerFromNumberdb(
-                                customersController.customers[index].id)) {
-                                nombreController.text =
-                                    customersController.customer!.name;
-                                emailController.text =
-                                    customersController.customer!.eMail;
-                                numeroDeTelefonoController.text =
-                                    customersController.customer!.phoneNumber;
-                                streetController.text =
-                                    customersController.customer!.street;
-                                cpController.text =
-                                    customersController.customer!.cp;
-                                dniController.text =
-                                    customersController.customer!.dni;
-                              }
-                              showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                  title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Editar cliente"), TextButton.icon(onPressed: (){Navigator.pop(context);cleanTextField();}, label: Icon(Icons.close, size: 20,)), ],),
-                                  content: SingleChildScrollView(
-                                    child:Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [ 
-                                      textfieldCustomer,
-                                      Container(
-                                        padding: EdgeInsets.fromLTRB(0,10,0,0),
-                                        child: ElevatedButton(onPressed: (){
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                          customersController.upgradeData(
-                                          customersController.customers[index].id,
-                                          nombreController.text,
-                                          emailController.text,
-                                          numeroDeTelefonoController.text,
-                                          streetController.text, cpController.text, dniController.text);
-                                          cleanTextField();
-                                        }, child: Icon(Icons.save)),
-                                      )
-                                    ],
-                                  ),
-                                )));
-                            }, child: Icon(Icons.edit_document))
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,  // fix the distribution of the buttons
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                      return BuenoDeHoras();
+                                    }));
+                                  },
+                                  child: Icon(Icons.timer),
+                                ),
+                              ),
+
+                              SizedBox(width: 10),  // Spacer between buttons (optional, to slightly separate the buttons)
+                              
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (await customersController.findCustomerFromNumberdb(
+                                      customersController.customers[index].id,
+                                    )) {
+                                      nombreController.text = customersController.customer!.name;
+                                      emailController.text = customersController.customer!.eMail;
+                                      numeroDeTelefonoController.text =
+                                          customersController.customer!.phoneNumber;
+                                      streetController.text = customersController.customer!.street;
+                                      cpController.text = customersController.customer!.cp;
+                                      dniController.text = customersController.customer!.dni;
+                                    }
+                                    showDialog<String>(
+                                      // ignore: use_build_context_synchronously
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog(
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Editar cliente"),
+                                            TextButton.icon(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                cleanTextField();
+                                              },
+                                              label: Icon(Icons.close, size: 20),
+                                            ),
+                                          ],
+                                        ),
+                                        content: SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              textfieldCustomer,
+                                              Container(
+                                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                    customersController.upgradeData(
+                                                      customersController.customers[index].id,
+                                                      nombreController.text,
+                                                      emailController.text,
+                                                      numeroDeTelefonoController.text,
+                                                      streetController.text,
+                                                      cpController.text,
+                                                      dniController.text,
+                                                    );
+                                                    cleanTextField();
+                                                  },
+                                                  child: Icon(Icons.save),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Icon(Icons.edit_document),
+                                ),
+                              ),
+                            ],
+                          )
                           ],
                         )
                         ),
@@ -408,11 +453,12 @@ void cleanTextField(){
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { casa, tienda }
 
+// ignore: must_be_immutable, use_key_in_widget_constructors
 class BuenoDeHoras extends StatelessWidget {
   
   final customerSearchController = TextEditingController();
   final startTimeController = TextEditingController();
-  final endTimeController = TextEditingController();
+  late final endTimeController = TextEditingController();
   
   SingingCharacter? radioButtonSelection;
 
@@ -482,7 +528,7 @@ class BuenoDeHoras extends StatelessWidget {
                                 style: TextStyle(color: Colors.black),
                                 controller: customerSearchController,
                                 decoration: InputDecoration(
-                                    hintText: 'Buscar al cliente por nombre o numero telefonico...',
+                                    hintText: 'Buscar al cliente por DNI',
                                     hintStyle: TextStyle(
                                       fontStyle: FontStyle.italic, //Italic style
                                     ),
@@ -493,14 +539,20 @@ class BuenoDeHoras extends StatelessWidget {
                               child: ElevatedButton(
                                   onPressed: () async {
                                     var tmp = false;
-                                    if(customerSearchController.text.contains(RegExp(r'\d'))){
+                                    if(await customersController.findCustomerFromDNIdb(customerSearchController.text)){
+                                      tmp=true;
+                                    }else{
+                                      tmp=false;
+                                    }
+                                    
+                                    /*if(customerSearchController.text.contains(RegExp(r'\d'))){
                                       tmp = await customersController.pullCustomersFromPhoneNumber(customerSearchController.text);
                                     }else if(customerSearchController.text.contains(RegExp(r'[a-zA-Z]'))){
                                       tmp = await customersController.pullCustomersFromName(customerSearchController.text);
                                     }else{
                                       customersController.pullCustomers();
                                       tmp=true;
-                                    }
+                                    }*/
                                     if(!tmp){
                                       customersController.alert(
                                         // ignore: use_build_context_synchronously
@@ -509,7 +561,6 @@ class BuenoDeHoras extends StatelessWidget {
                                         "The customer doesn't exist. Check the data you inserted. "
                                       );
                                       customerSearchController.text = "";
-                                      customersController.pullCustomers();
                                     }
                                   },child: Icon(Icons.search)
                                 ),
@@ -609,7 +660,10 @@ class BuenoDeHoras extends StatelessWidget {
                                 child: ElevatedButton(
                                     onPressed: () async {
                                       if (customersController.customer != null) {
-                                        if (await customersController.removeHours(int.parse(customerSearchController.text))) {
+                                        if (await customersController.removeHours(customerSearchController.text)) {
+                                          radioButtonSelection = null;
+                                          customersController.setStartName(TimeOfDay(hour: 0, minute: 0));
+                                          customersController.setEndTime(TimeOfDay(hour: 0, minute: 0));
                                           customersController.alert(context,"Saved", "time updated");
                                         }
                                       } else {

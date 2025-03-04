@@ -100,6 +100,12 @@ class ApplicationController extends ChangeNotifier {
   //Costumer
   Customer? customer;
 
+  TimeOfDay _startTime = TimeOfDay(hour: 0, minute: 0);
+  TimeOfDay _endTime = TimeOfDay(hour: 0, minute: 0);
+
+  //Tempo selezionato
+  TimeOfDay? selectedTime;
+
   BuildContext? classContext;
   bool connectionStatus = false; //To track the status of the connection
   // ignore: non_constant_identifier_names
@@ -107,14 +113,31 @@ class ApplicationController extends ChangeNotifier {
   MySqlConnection? database;
   String selectedContract = "";
 
-  
+  //GETTER
+  get startTime => timeInString(_startTime.hour, _startTime.minute);
+  get endTime => timeInString(_endTime.hour, _endTime.minute);
+
+  //SETTER
+  void setStartName(TimeOfDay startTime) {
+    _startTime = startTime;
+  }
+
+  void setEndTime(TimeOfDay endTime) {
+    _endTime = endTime;
+  }
+
+  //Methods to change TimeOfDay in String
+  static String timeInString(int hour, int minute) {
+    return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute}";
+  }
+
   //------------------------------------------ notifyListeners();
   //Need this to update the graphic called by the interfaces
   void notifyListenersLocal(){
     notifyListeners();
   }
 
-  //------------------------------------------ methods for the query
+  //------------------------------------------ Connection to the database
   void connectionDb() async {
 
     final conn = ConnectionSettings(
@@ -167,7 +190,17 @@ class ApplicationController extends ChangeNotifier {
       }
     }
   }
-  
+
+  //------------------------------------------ methods for the query
+  //This methods checks if the customers has remaining time in his contract
+  //------------------------TODO------------------------------
+  bool isActive(int id){
+    database!.query("SELECT timepo_riestante FROM clientela WHERE id = '$id'");
+
+
+    return false;
+  }
+
   //This method takes the customers from the database and saves them inside the "customers" vector
   void pullCustomers() async {
     customers.clear();//Clearing the array
@@ -201,6 +234,7 @@ class ApplicationController extends ChangeNotifier {
     notifyListeners();
   }
 
+  //This method takes the contracts from the database and saves them inside the "contracts" vector
   void pullContracts() async {
     contractTypes.clear(); //Clearing the array
 
@@ -303,18 +337,19 @@ class ApplicationController extends ChangeNotifier {
       hours = (minutes / 60).toInt();
       minutes = minutes - hours * 60;
     }
-
-    customer = Customer(
-        customerLocal['id'],
-        customerLocal['nombre'],
-        customerLocal['email'],
-        customerLocal['numero_telefonico'],
-        customerLocal['direccion'],
-        TimeOfDay(hour: hours, minute: minutes),
-        contractTypes[customerLocal['id_contratos']-1],
-        customerLocal['dni'],
-        customerLocal['cp']
-    );
+   if(customerLocal.isNotEmpty){
+      customer = Customer(
+          customerLocal['id'],
+          customerLocal['nombre'],
+          customerLocal['email'],
+          customerLocal['numero_telefonico'],
+          customerLocal['direccion'],
+          TimeOfDay(hour: hours, minute: minutes),
+          contractTypes[customerLocal['id_contratos']-1],
+          customerLocal['dni'],
+          customerLocal['cp']
+      );
+    }
 
     notifyListeners();
 
@@ -356,32 +391,71 @@ class ApplicationController extends ChangeNotifier {
     }
   }
 
-    Future<bool> pullCustomersFromPhoneNumber(String phoneNumber) async {
+  Future<bool> pullCustomersFromPhoneNumber(String phoneNumber) async {
     customers.clear();//Clearing the array
 
     var result = await database!.query("SELECT * FROM clientela WHERE numero_telefonico='$phoneNumber';"); //Query
+    if(result.isNotEmpty){
+      for (var customerDB in result) { //It fills the costumer array
+        Duration time = customerDB['tiempo_restante'];
+        int minutes = time.inMinutes;
+        int hours = 0;
 
-    for (var customerDB in result) { //It fills the costumer array
-      Duration time = customerDB['tiempo_restante'];
-      int minutes = time.inMinutes;
-      int hours = 0;
+        if (minutes >= 60) {
+          hours = (minutes / 60).toInt();
+          minutes = minutes - hours * 60;
+        }
 
-      if (minutes >= 60) {
-        hours = (minutes / 60).toInt();
-        minutes = minutes - hours * 60;
+        customers.add(Customer(
+            customerDB['id'],
+            customerDB['nombre'],
+            customerDB['email'],
+            customerDB['numero_telefonico'],
+            customerDB['direccion'],
+            TimeOfDay(hour: hours, minute: minutes),
+            contractTypes[customerDB['id_contratos']-1],
+            customerDB['dni'],
+            customerDB['cp'],
+          )
+        );
       }
+    }
 
-      customers.add(Customer(
-          customerDB['id'],
-          customerDB['nombre'],
-          customerDB['email'],
-          customerDB['numero_telefonico'],
-          customerDB['direccion'],
-          TimeOfDay(hour: hours, minute: minutes),
-          contractTypes[customerDB['id_contratos']-1],
-          customerDB['dni'],
-          customerDB['cp'],
-        )
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> findCustomerFromDNIdb(String dni) async {
+    Results customerdb;
+    ResultRow customerLocal;
+    try {
+      customerdb = await database!.query("SELECT * FROM clientela WHERE dni='$dni';");
+      customerLocal = customerdb.toList().first;
+    } catch (e) {
+      customer=null;
+      notifyListeners();
+      return false;
+    }
+
+    Duration time = customerLocal['tiempo_restante'];
+    int minutes = time.inMinutes;
+    int hours = 0;
+    if (minutes >= 60) {
+      hours = (minutes / 60).toInt();
+      minutes = minutes - hours * 60;
+    }
+
+    if(customerLocal.isNotEmpty){
+      customer = Customer(
+        customerLocal['id'],
+        customerLocal['nombre'],
+        customerLocal['email'],
+        customerLocal['numero_telefonico'],
+        customerLocal['direccion'],
+        TimeOfDay(hour: hours, minute: minutes),
+        contractTypes[customerLocal['id_contratos']-1],
+        customerLocal['dni'],
+        customerLocal['cp']
       );
     }
 
@@ -426,7 +500,7 @@ class ApplicationController extends ChangeNotifier {
   }
 
 //--------------------------------------------------------- part to control the time
-  Future<bool> removeHours(int index) async {
+  Future<bool> removeHours(String dni) async {
     TimeOfDay remainingTime = customer!.remainingContractTime;
     TimeOfDay timeToRemove = workHoursContadas();
     if (timeToRemove.minute == 0 && timeToRemove.hour == 0) {
@@ -453,7 +527,7 @@ class ApplicationController extends ChangeNotifier {
     Duration timeDuration = Duration(hours: time.hour, minutes: time.minute);
     try {
       await database!.query(
-          "UPDATE clientela SET tiempo_restante='$timeDuration' WHERE id = $index");
+          "UPDATE clientela SET tiempo_restante='$timeDuration' WHERE dni = '$dni'");
     } catch (e) {
       alert(classContext!, "Error", "an error occured changing the time");
       return false;
@@ -464,26 +538,21 @@ class ApplicationController extends ChangeNotifier {
     return true;
   }
 
-  TimeOfDay _startTime = TimeOfDay(hour: 0, minute: 0);
-  TimeOfDay _endTime = TimeOfDay(hour: 0, minute: 0);
-
   void selectTime(BuildContext context, bool start) async {
-    final TimeOfDay? newTime = await showTimePicker(
+    selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (newTime != null) {
+    if (selectedTime != null) {
       if (start) {
-        _startTime = newTime;
+        _startTime = selectedTime!;
       } else {
-        _endTime = newTime;
+        _endTime = selectedTime!;
       }
     }
     notifyListeners();
   }
-
-  get startTime => timeInString(_startTime.hour, _startTime.minute);
-  get endTime => timeInString(_endTime.hour, _endTime.minute);
+  
   TimeOfDay workHours() {
     int hours = _endTime.hour - _startTime.hour;
     int minutes = _endTime.minute - _startTime.minute;
@@ -546,9 +615,5 @@ class ApplicationController extends ChangeNotifier {
     } else {
       return "00:00";
     }
-  }
-
-  static String timeInString(int hour, int minute) {
-    return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute}";
   }
 }
