@@ -126,6 +126,10 @@ class ApplicationController extends ChangeNotifier {
     _endTime = endTime;
   }
 
+  void setCustomer(Customer customer){
+    this.customer = customer;
+  }
+
   //Methods to change TimeOfDay in String
   static String timeInString(int hour, int minute) {
     return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute}";
@@ -192,15 +196,6 @@ class ApplicationController extends ChangeNotifier {
   }
 
   //------------------------------------------ methods for the query
-  //This methods checks if the customers has remaining time in his contract
-  //------------------------TODO------------------------------
-  bool isActive(int id){
-    database!.query("SELECT timepo_riestante FROM clientela WHERE id = '$id'");
-
-
-    return false;
-  }
-
   //This method takes the customers from the database and saves them inside the "customers" vector
   void pullCustomers() async {
     customers.clear();//Clearing the array
