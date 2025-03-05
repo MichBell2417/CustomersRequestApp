@@ -113,6 +113,8 @@ class ApplicationController extends ChangeNotifier {
   MySqlConnection? database;
   String selectedContract = "";
 
+  bool? _serviceInShop;
+
   //GETTER
   get startTime => timeInString(_startTime.hour, _startTime.minute);
   get endTime => timeInString(_endTime.hour, _endTime.minute);
@@ -462,8 +464,6 @@ class ApplicationController extends ChangeNotifier {
     var customerid = await database!.query(
         "SELECT id FROM clientela WHERE nombre= '$name' AND email = '$eMail' AND numero_telefonico='$phoneNumber'");
 
-    //print(customerid.toList().first['id']);
-
     return customerid.toList().first['id'];
   }
 
@@ -488,7 +488,6 @@ class ApplicationController extends ChangeNotifier {
 
 
 //--------------------------------------------------------- part to check the selected radiobutton
-  bool? _serviceInShop;
   void serviceInShop(bool value) {
     _serviceInShop = value;
     notifyListeners();
@@ -516,6 +515,7 @@ class ApplicationController extends ChangeNotifier {
       } else {
         minutes = 0;
       }
+      return true;
     }
 
     var time = TimeOfDay(hour: hours, minute: minutes);
@@ -585,7 +585,7 @@ class ApplicationController extends ChangeNotifier {
       }
       return TimeOfDay(hour: hour, minute: minute);
     }
-    return TimeOfDay(hour: 0, minute: 0);
+    return TimeOfDay(hour: 10, minute: 10);
   }
 
   String workHoursStringContadas() {
