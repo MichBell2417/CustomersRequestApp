@@ -8,6 +8,8 @@ Future<void> main() async {
 }
 
 class PrincipalPage extends StatelessWidget {
+  const PrincipalPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

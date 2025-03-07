@@ -11,552 +11,8 @@ import 'package:image/image.dart' as img; // For image manipulation
 import 'dart:ui' as ui;  // Import dart:ui to work with images
 */
 
+///Global variable and methods
 late ApplicationController customersController;
-///--------------------------------Class with the interface for the menu
-class Menu extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-    customersController = context.watch<ApplicationController>();
-    if (!customersController.connectionStatus) {
-      customersController.classContext = context;
-      customersController.connectionDb();
-    }
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: 
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            tileMode: TileMode.clamp,
-            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
-          ),
-        ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-        title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
-      ),
-      body: Stack(
-        children: [
-           Center(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 300,
-                height: 75,
-                child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return customerView();
-                    }));
-                  }, child: Text("Lista de cliente")
-                ),
-              ),
-              /*SizedBox(
-                width: 300,
-                height: 75,
-                child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return BuenoDeHoras();
-                    }));
-                  }, child: Text("Bonus de horas")
-                ),
-              ),*/
-              SizedBox(
-                width: 300,
-                height: 75,
-                child: ElevatedButton(
-                  onPressed: (){
-                    // the interface have to be done 
-                    //Navigator.push(context, null);
-                  }, child: Text("Resguardo de deposito")
-                ),
-              ),
-            ],
-          ),
-        ),
-        if(!customersController.connectionStatus)
-        Opacity(
-            opacity: 0.8,
-            child: Container(
-              color: Colors.black,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Connection to database with IP address: ${customersController.IPaddress}", 
-                      style: TextStyle(color: Colors.blueAccent, fontSize: 20,),),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  ],
-                )
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-///-------------------------------- class with the interface to control the customers
-class customerView extends StatelessWidget{
-  final customerSearchController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    customersController = context.watch<ApplicationController>();
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: 
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            tileMode: TileMode.clamp,
-            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
-          ),
-        ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-        title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
-      ),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: (){
-                      showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Nuevo cliente",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                label: Icon(
-                                  Icons.close,
-                                  size: 20,
-                                  color: Colors.black, // Adjusted color to match the theme
-                                ),
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero, // No padding around the icon button
-                                ),
-                              ),
-                            ],
-                          ),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Improved text field
-                                textfieldCustomer,
-                                // Improved contract type section
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "Tipo de contrato: ",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: DropdownMenu<String>(
-                                          initialSelection: "-------",
-                                          onSelected: (String? value) {
-                                            customersController.selectedContract = value!;
-                                          },
-                                          dropdownMenuEntries: customersController.contractTypes
-                                              .map<DropdownMenuEntry<String>>(
-                                                (ContractType value) {
-                                                  return DropdownMenuEntry<String>(
-                                                    value: value.name,
-                                                    label: value.name,
-                                                  );
-                                                },
-                                              )
-                                              .toList(),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // Save button with custom styling
-                                Container(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      customersController.addCustomer(
-                                        nombreController.text,
-                                        emailController.text,
-                                        numeroDeTelefonoController.text,
-                                        streetController.text,
-                                        cpController.text,
-                                        dniController.text,
-                                      );
-                                      customersController.selectedContract = "";
-                                      cleanTextField();
-
-                                    },
-                                    label: Icon(
-                                      Icons.save,
-                                      size: 24, // Adjusted icon size for better visibility
-                                      color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white, // Background color
-                                      foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
-                                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                                      ),
-                                      elevation: 5, // Subtle shadow effect
-                                      shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16), // Rounded corners for the dialog
-                          ),
-                          contentPadding: EdgeInsets.all(16), // Padding around the content inside the dialog
-                        ),
-
-                      );
-                    },
-                    label: Icon(
-                      Icons.person_add_alt_1,
-                      size: 24, // Adjusted icon size for better visibility
-                      color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white, // Background color
-                      foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
-                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                      elevation: 5, // Subtle shadow effect
-                      // ignore: deprecated_member_use
-                      shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
-                    )
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: customerSearchController,
-                      decoration: InputDecoration(
-                        hintText: 'Buscar por nombre o numero telefonico...',
-                        hintStyle: TextStyle(
-                          fontStyle: FontStyle.italic, // Italic style for the hint
-                          color: Colors.grey[600], // Slightly lighter color for the hint
-                        ),
-                        // Customizing the text field border
-                        filled: true,
-                        fillColor: Colors.white, // Background color inside the text field
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
-                          borderSide: BorderSide(
-                            width: 1.5, // Border thickness
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: const Color.fromARGB(255, 29, 68, 134), // Stronger color when focused
-                            width: 2.0, // Slightly thicker border when focused
-                          ),
-                        ),
-                        // Padding inside the text field to make it more spacious
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    var tmp = false;
-                    if (customerSearchController.text.contains(RegExp(r'\d'))) {
-                      tmp = await customersController.pullCustomersFromPhoneNumber(customerSearchController.text);
-                    } else if (customerSearchController.text.contains(RegExp(r'[a-zA-Z]'))) {
-                      tmp = await customersController.pullCustomersFromName(customerSearchController.text);
-                    } else {
-                      customersController.pullCustomers();
-                      tmp = true;
-                    }
-                    if (!tmp) {
-                      customersController.alert(
-                        // ignore: use_build_context_synchronously
-                        context,
-                        "Error",
-                        "The customer doesn't exist. Check the data you inserted. "
-                      );
-                      customerSearchController.text = "";
-                      customersController.pullCustomers();
-                    }
-                  },
-                  icon: Icon(
-                    Icons.search,
-                    size: 24, // Adjusted icon size for better visibility
-                    color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
-                  ),
-                  label: Text(
-                    "Buscar", // Text to accompany the icon (optional)
-                    style: TextStyle(
-                      fontSize: 16, // Font size for better readability
-                      color:const Color.fromARGB(255, 29, 68, 134), // Text color matching the icon
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // Background color
-                    foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12), // Rounded corners
-                    ),
-                    elevation: 5, // Subtle shadow effect
-                    // ignore: deprecated_member_use
-                    shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: customersController.customers.length,
-              itemBuilder: (BuildContext context, int index) {
-                final customer = customersController.customers[index];
-                bool hasRemainingTime = customer.remainingContractTime.hour != 0 || customer.remainingContractTime.minute != 0;
-                
-                return Card(
-                  elevation: 4, // Adds a subtle shadow to the card for a floating effect
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Margins between items
-                  child: ListTile(
-                    tileColor: Colors.white, // Light background color for the tile
-                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the tile
-                    leading: Icon(
-                      hasRemainingTime ? Icons.pause : Icons.stop,
-                      color: hasRemainingTime ? Colors.green : Colors.red, // Color based on the contract time
-                      size: 30, // Adjusted icon size for better visibility
-                    ),
-                    title: Text(
-                      customer.name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold, // Bold title for better readability
-                        color: Colors.black,
-                      ),
-                    ),
-                    subtitle: Text(
-                      customer.dni,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54, // Slightly lighter color for subtitle
-                      ),
-                    ),
-                    trailing: Icon(
-                      Icons.ads_click,
-                      color: const Color.fromARGB(255, 29, 68, 134), // Blue color for the trailing icon
-                      size: 24, // Slightly smaller icon for the trailing arrow
-                    ),
-                    onTap:() {
-                      showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Cliente n. ${customersController.customers[index].id}"), TextButton.icon(onPressed: (){Navigator.pop(context);}, label: Icon(Icons.close, size: 20,)), ],),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(children: [
-                              Text("Nombre: ",style: TextStyle(fontWeight: FontWeight.bold),),
-                              Text(customersController.customers[index].name),
-                            ],),
-                            Row(
-                              children: [
-                                Text("Numero telefonico: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text("${customersController.customers[index].phoneNumber}"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("eMail: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text("${customersController.customers[index].eMail}"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("Direccion: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text("${customersController.customers[index].street}"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("Codigo postal: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text(customersController.customers[index].cp),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("Tipo de contrato: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text("${customersController.customers[index].contractType.name}"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("Tiempo restante: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text(customersController.customers[index].remainingContractTimeStr()),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("DNI: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text(customersController.customers[index].dni),
-                              ],
-                            ),
-                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,  // fix the distribution of the buttons
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                      customersController.setCustomer(customersController.customers[index]);
-                                      return BuenoDeHoras();
-                                    }));
-                                  },
-                                  child: Icon(Icons.timer),
-                                ),
-                              ),
-
-                              SizedBox(width: 10),  // Spacer between buttons (optional, to slightly separate the buttons)
-                              
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    if (await customersController.findCustomerFromNumberdb(
-                                      customersController.customers[index].id,
-                                    )) {
-                                      nombreController.text = customersController.customer!.name;
-                                      emailController.text = customersController.customer!.eMail;
-                                      numeroDeTelefonoController.text =
-                                          customersController.customer!.phoneNumber;
-                                      streetController.text = customersController.customer!.street;
-                                      cpController.text = customersController.customer!.cp;
-                                      dniController.text = customersController.customer!.dni;
-                                    }
-                                    showDialog<String>(
-                                      // ignore: use_build_context_synchronously
-                                      context: context,
-                                      builder: (BuildContext context) => AlertDialog(
-                                        title: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text("Editar cliente"),
-                                            TextButton.icon(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                cleanTextField();
-                                              },
-                                              label: Icon(Icons.close, size: 20),
-                                            ),
-                                          ],
-                                        ),
-                                        content: SingleChildScrollView(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              textfieldCustomer,
-                                              Container(
-                                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.pop(context);
-                                                    customersController.upgradeData(
-                                                      customersController.customers[index].id,
-                                                      nombreController.text,
-                                                      emailController.text,
-                                                      numeroDeTelefonoController.text,
-                                                      streetController.text,
-                                                      cpController.text,
-                                                      dniController.text,
-                                                    );
-                                                    cleanTextField();
-                                                  },
-                                                  child: Icon(Icons.save),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(Icons.edit_document),
-                                ),
-                              ),
-                            ],
-                          )
-                          ],
-                        )
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
 
 final customerSearchController = TextEditingController();
 final streetController = TextEditingController();
@@ -565,6 +21,7 @@ final numeroDeTelefonoController = TextEditingController();
 final emailController = TextEditingController();
 final cpController = TextEditingController();
 final dniController = TextEditingController();
+
 /// this variable contains the graphic part of the textField
 Widget textfieldCustomer = Column(
   children: [
@@ -768,6 +225,704 @@ void cleanTextField(){
   cpController.text = "";
   dniController.text = "";
 }
+
+///--------------------------------Class with the interface for the menu
+class Menu extends StatelessWidget{
+  const Menu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
+    if (!customersController.connectionStatus) {
+      customersController.classContext = context;
+      customersController.connectionDb();
+    }
+    return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: 
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            tileMode: TileMode.clamp,
+            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+          ),
+        ),
+        title: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) {
+                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                  return Menu();
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.only(right: 10), // Adjust this value to move the text to the left
+            child: Text(
+              'Divermatica',
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 22, // Optional: Adjust font size if needed
+              ),
+            ),
+          ),
+        ),
+        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+      ),
+
+      body: Stack(
+        children: [
+           Center(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return customerView();
+                    }));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // Background color
+                    foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Rounded corners
+                    ),
+                    elevation: 5, // Subtle shadow effect
+                    // ignore: deprecated_member_use
+                    shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                  ), 
+                  child: Text("Lista de cliente"),
+                ),
+              ),
+              /*SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      return BuenoDeHoras();
+                    }));
+                  }, child: Text("Bonus de horas")
+                ),
+              ),*/
+              SizedBox(
+                width: 300,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: (){
+                    // the interface have to be done 
+                    //Navigator.push(context, null);
+                  },style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // Background color
+                    foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Rounded corners
+                    ),
+                    elevation: 5, // Subtle shadow effect
+                    // ignore: deprecated_member_use
+                    shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                  ),child: Text("Resguardo de deposito"),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if(!customersController.connectionStatus)
+        Opacity(
+            opacity: 0.8,
+            child: Container(
+              color: Colors.black,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Connection to database with IP address: ${customersController.IPaddress}", 
+                      style: TextStyle(color: Colors.blueAccent, fontSize: 20,),),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                )
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+///-------------------------------- class with the interface to control the customers
+// ignore: camel_case_types
+class customerView extends StatelessWidget{
+  
+  final customerSearchController = TextEditingController();
+
+  customerView({super.key});
+  
+  // Helper method to reduce redundancy in row styling
+  Widget _buildCustomerInfoRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Text(value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
+    return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: 
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            tileMode: TileMode.clamp,
+            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+          ),
+        ),
+        title: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) {
+                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                  return Menu();
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.only(right: 10), // Adjust this value to move the text to the left
+            child: Text(
+              'Divermatica',
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 22, // Optional: Adjust font size if needed
+              ),
+            ),
+          ),
+        ),
+        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+        
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.computer),
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) {
+                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    print("TODO page ResguardoDeDeposito");
+                    return customerView();
+                  },
+                ),
+              );
+            },
+          ),
+        ]
+      ),
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: (){
+                      showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Nuevo cliente",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                label: Icon(
+                                  Icons.close,
+                                  size: 20,
+                                  color: Colors.black, // Adjusted color to match the theme
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero, // No padding around the icon button
+                                ),
+                              ),
+                            ],
+                          ),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Improved text field
+                                textfieldCustomer,
+                                // Improved contract type section
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "Tipo de contrato: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: DropdownMenu<String>(
+                                          initialSelection: "-------",
+                                          onSelected: (String? value) {
+                                            customersController.selectedContract = value!;
+                                          },
+                                          dropdownMenuEntries: customersController.contractTypes
+                                              .map<DropdownMenuEntry<String>>(
+                                                (ContractType value) {
+                                                  return DropdownMenuEntry<String>(
+                                                    value: value.name,
+                                                    label: value.name,
+                                                  );
+                                                },
+                                              )
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Save button with custom styling
+                                Container(
+                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      customersController.addCustomer(
+                                        nombreController.text,
+                                        emailController.text,
+                                        numeroDeTelefonoController.text,
+                                        streetController.text,
+                                        cpController.text,
+                                        dniController.text,
+                                      );
+                                      customersController.selectedContract = "";
+                                      cleanTextField();
+
+                                    },
+                                    label: Icon(
+                                      Icons.save,
+                                      size: 24, // Adjusted icon size for better visibility
+                                      color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white, // Background color
+                                      foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                                      ),
+                                      elevation: 5, // Subtle shadow effect
+                                      // ignore: deprecated_member_use
+                                      shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16), // Rounded corners for the dialog
+                          ),
+                          contentPadding: EdgeInsets.all(16), // Padding around the content inside the dialog
+                        ),
+
+                      );
+                    },
+                    label: Icon(
+                      Icons.person_add_alt_1,
+                      size: 24, // Adjusted icon size for better visibility
+                      color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white, // Background color
+                      foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                      elevation: 5, // Subtle shadow effect
+                      // ignore: deprecated_member_use
+                      shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                    )
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: customerSearchController,
+                      decoration: InputDecoration(
+                        hintText: 'Buscar por nombre o numero telefonico...',
+                        hintStyle: TextStyle(
+                          fontStyle: FontStyle.italic, // Italic style for the hint
+                          color: Colors.grey[600], // Slightly lighter color for the hint
+                        ),
+                        // Customizing the text field border
+                        filled: true,
+                        fillColor: Colors.white, // Background color inside the text field
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderSide: BorderSide(
+                            width: 1.5, // Border thickness
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            width: 1.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 29, 68, 134), // Stronger color when focused
+                            width: 2.0, // Slightly thicker border when focused
+                          ),
+                        ),
+                        // Padding inside the text field to make it more spacious
+                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                      ),
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    var tmp = false;
+                    if (customerSearchController.text.contains(RegExp(r'\d'))) {
+                      tmp = await customersController.pullCustomersFromPhoneNumber(customerSearchController.text);
+                    } else if (customerSearchController.text.contains(RegExp(r'[a-zA-Z]'))) {
+                      tmp = await customersController.pullCustomersFromName(customerSearchController.text);
+                    } else {
+                      customersController.pullCustomers();
+                      tmp = true;
+                    }
+                    if (!tmp) {
+                      customersController.alert(
+                        // ignore: use_build_context_synchronously
+                        context,
+                        "Error",
+                        "The customer doesn't exist. Check the data you inserted. "
+                      );
+                      customerSearchController.text = "";
+                      customersController.pullCustomers();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.search,
+                    size: 24, // Adjusted icon size for better visibility
+                    color: const Color.fromARGB(255, 29, 68, 134), // White icon color for contrast
+                  ),
+                  label: Text(
+                    "Buscar", // Text to accompany the icon (optional)
+                    style: TextStyle(
+                      fontSize: 16, // Font size for better readability
+                      color:const Color.fromARGB(255, 29, 68, 134), // Text color matching the icon
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // Background color
+                    foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Rounded corners
+                    ),
+                    elevation: 5, // Subtle shadow effect
+                    // ignore: deprecated_member_use
+                    shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: customersController.customers.length,
+              itemBuilder: (BuildContext context, int index) {
+                final customer = customersController.customers[index];
+                bool hasRemainingTime = customer.remainingContractTime.hour != 0 || customer.remainingContractTime.minute != 0;
+                
+                return Card(
+                  elevation: 4, // Adds a subtle shadow to the card for a floating effect
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                  ),
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Margins between items
+                  child: ListTile(
+                    tileColor: Colors.white, // Light background color for the tile
+                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the tile
+                    leading: Icon(
+                      hasRemainingTime ? Icons.pause : Icons.stop,
+                      color: hasRemainingTime ? Colors.green : Colors.red, // Color based on the contract time
+                      size: 30, // Adjusted icon size for better visibility
+                    ),
+                    title: Text(
+                      customer.name,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold, // Bold title for better readability
+                        color: Colors.black,
+                      ),
+                    ),
+                    subtitle: Text(
+                      customer.dni,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54, // Slightly lighter color for subtitle
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.ads_click,
+                      color: const Color.fromARGB(255, 29, 68, 134), // Blue color for the trailing icon
+                      size: 24, // Slightly smaller icon for the trailing arrow
+                    ),
+                    onTap:() {
+                      showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Cliente n. ${customersController.customers[index].id}",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                label: Icon(
+                                  Icons.close,
+                                  size: 20,
+                                  color: Colors.black, // Adjusted color to match the theme
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero, // No padding around the icon button
+                                ),
+                              ),
+                            ],
+                          ),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildCustomerInfoRow("Nombre: ", customersController.customers[index].name),
+                                _buildCustomerInfoRow("Número telefónico: ", customersController.customers[index].phoneNumber),
+                                _buildCustomerInfoRow("E-Mail: ", customersController.customers[index].eMail),
+                                _buildCustomerInfoRow("Dirección: ", customersController.customers[index].street),
+                                _buildCustomerInfoRow("Código postal: ", customersController.customers[index].cp),
+                                _buildCustomerInfoRow("Tipo de contrato: ", customersController.customers[index].contractType.name),
+                                _buildCustomerInfoRow("Tiempo restante: ", customersController.customers[index].remainingContractTimeStr()),
+                                _buildCustomerInfoRow("DNI: ", customersController.customers[index].dni),
+                                SizedBox(height: 20), // Space before buttons
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context, MaterialPageRoute(
+                                              builder: (context) {
+                                                customersController.setCustomer(customersController.customers[index]);
+                                                return BuenoDeHoras();
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        label: Icon(
+                                          Icons.timer,
+                                          size: 24, // Adjusted icon size for better visibility
+                                          color: const Color.fromARGB(255, 29, 68, 134), // Icon color for contrast
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white, // Background color
+                                          foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                                          padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12), // Rounded corners
+                                          ),
+                                          elevation: 5, // Subtle shadow effect
+                                          // ignore: deprecated_member_use
+                                          shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10), // Space between the two buttons
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () async {
+                                          if (await customersController.findCustomerFromNumberdb(customersController.customers[index].id)) {
+                                            nombreController.text = customersController.customer!.name;
+                                            emailController.text = customersController.customer!.eMail;
+                                            numeroDeTelefonoController.text = customersController.customer!.phoneNumber;
+                                            streetController.text = customersController.customer!.street;
+                                            cpController.text = customersController.customer!.cp;
+                                            dniController.text = customersController.customer!.dni;
+                                          }
+                                          showDialog<String>(
+                                            // ignore: use_build_context_synchronously
+                                            context: context,
+                                            builder: (BuildContext context) => AlertDialog(
+                                              title: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Editar cliente",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                  TextButton.icon(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    label: Icon(
+                                                      Icons.close,
+                                                      size: 20,
+                                                      color: Colors.black, // Adjusted color to match the theme
+                                                    ),
+                                                    style: TextButton.styleFrom(
+                                                      padding: EdgeInsets.zero, // No padding around the icon button
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              content: SingleChildScrollView(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    textfieldCustomer,
+                                                    SizedBox(height: 10),
+                                                    ElevatedButton.icon(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        Navigator.pop(context);
+                                                        customersController.upgradeData(
+                                                          customersController.customers[index].id,
+                                                          nombreController.text,
+                                                          emailController.text,
+                                                          numeroDeTelefonoController.text,
+                                                          streetController.text,
+                                                          cpController.text,
+                                                          dniController.text,
+                                                        );
+                                                        cleanTextField();
+                                                      },
+                                                      label: Icon(
+                                                        Icons.save_alt,
+                                                        size: 24, // Adjusted icon size for better visibility
+                                                        color: const Color.fromARGB(255, 29, 68, 134), // Icon color for contrast
+                                                      ),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: Colors.white, // Background color
+                                                        foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                                                        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                                                        ),
+                                                        elevation: 5, // Subtle shadow effect
+                                                        // ignore: deprecated_member_use
+                                                        shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        label: Icon(
+                                          Icons.edit_document,
+                                          size: 24, // Adjusted icon size for better visibility
+                                          color: const Color.fromARGB(255, 29, 68, 134), // Icon color for contrast
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white, // Background color
+                                          foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                                          padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12), // Rounded corners
+                                          ),
+                                          elevation: 5, // Subtle shadow effect
+                                          // ignore: deprecated_member_use
+                                          shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { casa, tienda }
 
@@ -851,17 +1006,57 @@ class BuenoDeHoras extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: 
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              tileMode: TileMode.clamp,
-              colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            tileMode: TileMode.clamp,
+            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+          ),
+        ),
+        title: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) {
+                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                  return Menu();
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.only(right: 10), // Adjust this value to move the text to the left
+            child: Text(
+              'Divermatica',
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 22, // Optional: Adjust font size if needed
+              ),
             ),
           ),
+        ),
         leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-        title: Text('Divermatica', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),),
+        
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios,size: 20),
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) {
+                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    return customerView();
+                  },
+                ),
+              );
+            },
+          ),
+        ]
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -972,7 +1167,7 @@ class BuenoDeHoras extends StatelessWidget {
                                 value: SingingCharacter.casa,
                                 groupValue: selectedValue,
                                 onChanged: (SingingCharacter? value) {
-                                  customersController.serviceInShop(false);
+                                  customersController.serviceInShop(2);
                                   radioButtonSelectionNotifier.value = value;
                                 },
                               ),
@@ -987,7 +1182,7 @@ class BuenoDeHoras extends StatelessWidget {
                                 value: SingingCharacter.tienda,
                                 groupValue: selectedValue,
                                 onChanged: (SingingCharacter? value) {
-                                  customersController.serviceInShop(true);
+                                  customersController.serviceInShop(1);
                                   radioButtonSelectionNotifier.value = value;
                                 },
                               ),
@@ -1020,13 +1215,13 @@ class BuenoDeHoras extends StatelessWidget {
                               onPressed: () {
                                 customersController.selectTime(context, true); // Start time button action
                               },
-                              child: Text("Hora de inicio", style: TextStyle(fontSize: 16)),
                               style: ElevatedButton.styleFrom(// Main blue accent color for the button
                                 backgroundColor: Colors.white,
                                 padding: EdgeInsets.symmetric(vertical: 14,horizontal: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 elevation: 5, // Slight shadow for the button
                               ),
+                              child: Text("Hora de inicio", style: TextStyle(fontSize: 16)),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -1045,13 +1240,13 @@ class BuenoDeHoras extends StatelessWidget {
                               onPressed: () {
                                 customersController.selectTime(context, false); // End time button action
                               },
-                              child: Text("Hora de fin", style: TextStyle(fontSize: 16)),
                               style: ElevatedButton.styleFrom( // Main blue accent color for the button
                                 backgroundColor: Colors.white,
                                 padding: EdgeInsets.symmetric(vertical: 14,horizontal: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 elevation: 5, // Slight shadow for the button
                               ),
+                              child: Text("Hora de fin", style: TextStyle(fontSize: 16)),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -1129,22 +1324,27 @@ class BuenoDeHoras extends StatelessWidget {
                                 radioButtonSelectionNotifier.value=null;
                                 customersController.setStartName(TimeOfDay(hour: 0, minute: 0));
                                 customersController.setEndTime(TimeOfDay(hour: 0, minute: 0));
+                                customersController.serviceInShop(0);
+                                // ignore: use_build_context_synchronously
                                 customersController.alert(context, "Guardado", "Tiempo actualizado"); // Success message
+                              }else{
+                                // ignore: use_build_context_synchronously
+                                customersController.alert(context, "Error", "an error occured changing the time");
                               }
                             } else {
-                              customersController.alert(context, "Error", "Inserte algo..."); // Error message if no customer is selected
+                              customersController.alert(context, "Error", "This customer doesn't exist"); // Error message if no customer is selected
                             }
                           },
-                          child: Text("Guardar", style: TextStyle(fontSize: 16)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             elevation: 5, // Slight shadow for the button
                           ),
+                          child: Text("Guardar", style: TextStyle(fontSize: 16)),
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      /*SizedBox(width: 10,),
                       // View Data button
                       Expanded(
                         flex: 2,
@@ -1152,15 +1352,15 @@ class BuenoDeHoras extends StatelessWidget {
                           onPressed: () {
                             print("sjdiahifciuswgbi");
                           },
-                          child: Text("Ver Datos", style: TextStyle(fontSize: 16)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             elevation: 5, // Slight shadow for the button
                           ),
+                          child: Text("Ver Datos", style: TextStyle(fontSize: 16)),
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ],
@@ -1175,6 +1375,7 @@ class BuenoDeHoras extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12), // Rounded corners for a cohesive look
                   boxShadow: [
                     BoxShadow(
+                      // ignore: deprecated_member_use
                       color: Colors.black.withOpacity(0.1), // Light shadow for a floating effect
                       spreadRadius: 2,
                       blurRadius: 8,
@@ -1197,13 +1398,13 @@ class BuenoDeHoras extends StatelessWidget {
                             onPressed: () {
                               controllerSAT.clear();
                             },
-                            child: Text("Limpia"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white, // White background
                               padding: EdgeInsets.symmetric(vertical: 14), // Consistent padding
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
                               elevation: 5, // Slight shadow for a floating effect
                             ),
+                            child: Text("Limpia"),
                           ),
                         ],
                       ),
@@ -1242,13 +1443,13 @@ class BuenoDeHoras extends StatelessWidget {
                             onPressed: () {
                               controllerCustomers.clear();
                             },
-                            child: Text("Limpia"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white, // White background
                               padding: EdgeInsets.symmetric(vertical: 14), // Consistent padding
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
                               elevation: 5, // Slight shadow for a floating effect
                             ),
+                            child: Text("Limpia"),
                           ),
                         ],
                       ),
@@ -1285,3 +1486,18 @@ class BuenoDeHoras extends StatelessWidget {
     );
   }
 }
+
+///TODO 
+/*class ResguardoDeDeposito extends StatelessWidget{
+  const Menu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    customersController = context.watch<ApplicationController>();
+    if (!customersController.connectionStatus) {
+      customersController.classContext = context;
+      customersController.connectionDb();
+    }
+    return Scaffold();
+  }
+}*/

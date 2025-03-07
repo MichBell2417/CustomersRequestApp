@@ -113,7 +113,7 @@ class ApplicationController extends ChangeNotifier {
   MySqlConnection? database;
   String selectedContract = "";
 
-  bool? _serviceInShop;
+  int _serviceInShop = 0;
 
   //GETTER
   get startTime => timeInString(_startTime.hour, _startTime.minute);
@@ -488,49 +488,51 @@ class ApplicationController extends ChangeNotifier {
 
 
 //--------------------------------------------------------- part to check the selected radiobutton
-  void serviceInShop(bool value) {
-    _serviceInShop = value;
-    notifyListeners();
+  void serviceInShop(int value) {
+    if(value>-1 && value<3){
+      _serviceInShop = value;
+      notifyListeners();
+    }
   }
 
 //--------------------------------------------------------- part to control the time
   Future<bool> removeHours(String dni) async {
     TimeOfDay remainingTime = customer!.remainingContractTime;
     TimeOfDay timeToRemove = workHoursContadas();
-    if (timeToRemove.minute == 0 && timeToRemove.hour == 0) {
-      return false;
-    }
-    if (_serviceInShop == null) {
-      return false;
-    }
+    bool f=false;
+
     int hours = remainingTime.hour - timeToRemove.hour;
     int minutes = remainingTime.minute - timeToRemove.minute;
-    if (hours < 0) {
+
+    if (timeToRemove.minute == 0 && timeToRemove.hour == 0) {
+      f=false;
+    }else if (_serviceInShop == 0) {
+      f=false;
+    }else if (hours < 0) {
       hours = 0;
-    }
-    if (minutes < 0) {
+    }else if (minutes < 0) {
       if (hours > 0) {
         hours -= 1;
         minutes = 60 + minutes;
       } else {
         minutes = 0;
       }
-      return true;
+      f=true;
     }
 
     var time = TimeOfDay(hour: hours, minute: minutes);
     Duration timeDuration = Duration(hours: time.hour, minutes: time.minute);
     try {
-      await database!.query(
-          "UPDATE clientela SET tiempo_restante='$timeDuration' WHERE dni = '$dni'");
+      await database!.query("UPDATE clientela SET tiempo_restante='$timeDuration' WHERE dni = '$dni'");
+      f=true;
     } catch (e) {
-      alert(classContext!, "Error", "an error occured changing the time");
-      return false;
+      f=false;
     }
 
     customer!._remainingContractTime = TimeOfDay(hour: hours, minute: minutes);
     notifyListeners();
-    return true;
+
+    return f;
   }
 
   void selectTime(BuildContext context, bool start) async {
@@ -538,6 +540,7 @@ class ApplicationController extends ChangeNotifier {
       context: context,
       initialTime: TimeOfDay.now(),
     );
+
     if (selectedTime != null) {
       if (start) {
         _startTime = selectedTime!;
@@ -545,6 +548,7 @@ class ApplicationController extends ChangeNotifier {
         _endTime = selectedTime!;
       }
     }
+    
     notifyListeners();
   }
   
@@ -572,8 +576,8 @@ class ApplicationController extends ChangeNotifier {
     var time = workHours();
     int minute = time.minute;
     int hour = time.hour;
-    if (_serviceInShop != null) {
-      if (_serviceInShop!) {
+    if (_serviceInShop != 0) {
+      if (_serviceInShop == 1) {
         if (time.minute % 15 != 0) {
           minute = 15 * (minute ~/ 15) + 15;
         }
@@ -592,8 +596,8 @@ class ApplicationController extends ChangeNotifier {
     var time = workHours();
     int minute = time.minute;
     int hour = time.hour;
-    if (_serviceInShop != null) {
-      if (_serviceInShop!) {
+    if (_serviceInShop != 0) {
+      if (_serviceInShop == 1) {
         if (time.minute % 15 != 0) {
           minute = 15 * (minute ~/ 15) + 15;
         }
