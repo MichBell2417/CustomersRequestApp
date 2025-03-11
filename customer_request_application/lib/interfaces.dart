@@ -227,8 +227,8 @@ void cleanTextField(){
 }
 
 ///--------------------------------Class with the interface for the menu
+// ignore: use_key_in_widget_constructors
 class Menu extends StatelessWidget{
-  const Menu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -305,24 +305,14 @@ class Menu extends StatelessWidget{
                   child: Text("Lista de cliente"),
                 ),
               ),
-              /*SizedBox(
-                width: 300,
-                height: 75,
-                child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return BuenoDeHoras();
-                    }));
-                  }, child: Text("Bonus de horas")
-                ),
-              ),*/
               SizedBox(
                 width: 300,
                 height: 75,
                 child: ElevatedButton(
                   onPressed: (){
-                    // the interface have to be done 
-                    //Navigator.push(context, null);
+                    Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return resguardoDeDeposito();
+                    }));
                   },style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white, // Background color
                     foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
@@ -442,8 +432,7 @@ class customerView extends StatelessWidget{
                 MaterialPageRoute(
                   builder: (context) {
                     //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
-                    print("TODO page ResguardoDeDeposito");
-                    return customerView();
+                    return resguardoDeDeposito();
                   },
                 ),
               );
@@ -771,7 +760,7 @@ class customerView extends StatelessWidget{
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: ElevatedButton.icon(
+                                      child: hasRemainingTime ? ElevatedButton.icon(
                                         onPressed: () {
                                           Navigator.push(
                                             context, MaterialPageRoute(
@@ -798,7 +787,29 @@ class customerView extends StatelessWidget{
                                           // ignore: deprecated_member_use
                                           shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
                                         ),
-                                      ),
+                                      ) 
+                                      : ElevatedButton.icon(
+                                        onPressed: () {
+                                          customersController.alert(context, "Error", "This customer finished his contract.");
+                                        },
+                                        label: Icon(
+                                          Icons.timer,
+                                          size: 24, // Adjusted icon size for better visibility
+                                          color: const Color.fromARGB(255, 29, 68, 134), // Icon color for contrast
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red, // Background color
+                                          foregroundColor: const Color.fromARGB(255, 29, 68, 134), // Text and icon color
+                                          padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20), // Padding for better spacing
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12), // Rounded corners
+                                          ),
+                                          elevation: 5, // Subtle shadow effect
+                                          // ignore: deprecated_member_use
+                                          shadowColor: Colors.blue.withOpacity(0.3), // Light blue shadow for effect
+                                        ),
+                                      )
+
                                     ),
                                     SizedBox(width: 10), // Space between the two buttons
                                     Expanded(
@@ -1117,10 +1128,8 @@ class BuenoDeHoras extends StatelessWidget {
                                   customersController.customer != null
                                       ? customersController.customer!.remainingContractTimeStr()
                                       : "N/A",
-                                  style: customersController.customer != null &&
-                                          customersController.customer!.remainingContractTime.hour == 0 &&
-                                          customersController.customer!.remainingContractTime.minute == 0
-                                      ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)
+                                  style: customersController.customer != null && customersController.customer!.remainingContractTime.hour == 0 && customersController.customer!.remainingContractTime.minute == 0 
+                                      ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16) 
                                       : TextStyle(fontSize: 16, color: Colors.black),
                                 ),
                               ],
@@ -1315,24 +1324,21 @@ class BuenoDeHoras extends StatelessWidget {
                       // Save button
                       Expanded(
                         flex: 2,
-                        child: ElevatedButton(
+                        child: 
+                        customersController.customer!.remainingContractTime.hour != 0 || customersController.customer!.remainingContractTime.minute != 0 
+                        ? ElevatedButton(
                           onPressed: () async {
-                            if (customersController.customer != null) {
-                              bool success = await customersController.removeHours(customersController.customer!.dni);
-                              if (success) {
-                                radioButtonSelection = null;
-                                radioButtonSelectionNotifier.value=null;
-                                customersController.setStartName(TimeOfDay(hour: 0, minute: 0));
-                                customersController.setEndTime(TimeOfDay(hour: 0, minute: 0));
-                                customersController.serviceInShop(0);
-                                // ignore: use_build_context_synchronously
-                                customersController.alert(context, "Guardado", "Tiempo actualizado"); // Success message
-                              }else{
-                                // ignore: use_build_context_synchronously
-                                customersController.alert(context, "Error", "an error occured changing the time");
-                              }
-                            } else {
-                              customersController.alert(context, "Error", "This customer doesn't exist"); // Error message if no customer is selected
+                            bool success = await customersController.removeHours(customersController.customer!.dni);
+
+                            radioButtonSelection = null;
+                            radioButtonSelectionNotifier.value=null;
+                            customersController.setStartName(TimeOfDay(hour: 0, minute: 0));
+                            customersController.setEndTime(TimeOfDay(hour: 0, minute: 0));
+                            customersController.serviceInShop(0);
+
+                            if (success) {
+                              // ignore: use_build_context_synchronously
+                              customersController.alert(context, "Guardado", "Tiempo actualizado"); // Success message
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -1342,7 +1348,20 @@ class BuenoDeHoras extends StatelessWidget {
                             elevation: 5, // Slight shadow for the button
                           ),
                           child: Text("Guardar", style: TextStyle(fontSize: 16)),
-                        ),
+                        ) 
+                        : ElevatedButton(
+                          onPressed: (){
+                              customersController.alert(context, "Error", "This customer finished his contract.");
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 5, // Slight shadow for the button
+                          ),
+                          child: Text("Guardar", style: TextStyle(fontSize: 16)),
+                        ) 
+                        ,
                       ),
                       /*SizedBox(width: 10,),
                       // View Data button
@@ -1487,17 +1506,72 @@ class BuenoDeHoras extends StatelessWidget {
   }
 }
 
-///TODO 
-/*class ResguardoDeDeposito extends StatelessWidget{
-  const Menu({super.key});
-
+// ignore: camel_case_types, use_key_in_widget_constructors
+class resguardoDeDeposito extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     customersController = context.watch<ApplicationController>();
+
     if (!customersController.connectionStatus) {
       customersController.classContext = context;
       customersController.connectionDb();
     }
-    return Scaffold();
+
+    return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: 
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            tileMode: TileMode.clamp,
+            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
+          ),
+        ),
+        title: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) {
+                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                  return Menu();
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.only(right: 10), // Adjust this value to move the text to the left
+            child: Text(
+              'Divermatica',
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 22, // Optional: Adjust font size if needed
+              ),
+            ),
+          ),
+        ),
+        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+        
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.people,size: 20),
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) {
+                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    return customerView();
+                  },
+                ),
+              );
+            },
+          ),
+        ]
+      ),
+    );
   }
-}*/
+}

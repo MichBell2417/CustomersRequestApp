@@ -499,40 +499,40 @@ class ApplicationController extends ChangeNotifier {
   Future<bool> removeHours(String dni) async {
     TimeOfDay remainingTime = customer!.remainingContractTime;
     TimeOfDay timeToRemove = workHoursContadas();
-    bool f=false;
 
-    int hours = remainingTime.hour - timeToRemove.hour;
-    int minutes = remainingTime.minute - timeToRemove.minute;
+    int newHours = remainingTime.hour - timeToRemove.hour;
+    int newMinutes = remainingTime.minute - timeToRemove.minute;
 
-    if (timeToRemove.minute == 0 && timeToRemove.hour == 0) {
-      f=false;
-    }else if (_serviceInShop == 0) {
-      f=false;
-    }else if (hours < 0) {
-      hours = 0;
-    }else if (minutes < 0) {
-      if (hours > 0) {
-        hours -= 1;
-        minutes = 60 + minutes;
+    if (_serviceInShop == 0) {
+      alert(classContext!, "Error", 'Select the "Tipo de asistencia"');
+      return false;
+    }else if (timeToRemove.minute == 0 && timeToRemove.hour == 0) {
+      alert(classContext!, "Error", "No time to remove was inserted.");
+      return false;
+    }else if (newHours < 0) {
+      newHours = 0;
+    }else if (newMinutes < 0) {
+      if (newHours > 0) {
+        newHours -= 1;
+        newMinutes = 60 + newMinutes;
       } else {
-        minutes = 0;
+        newMinutes = 0;
       }
-      f=true;
     }
 
-    var time = TimeOfDay(hour: hours, minute: minutes);
+    var time = TimeOfDay(hour: newHours, minute: newMinutes);
     Duration timeDuration = Duration(hours: time.hour, minutes: time.minute);
     try {
       await database!.query("UPDATE clientela SET tiempo_restante='$timeDuration' WHERE dni = '$dni'");
-      f=true;
     } catch (e) {
-      f=false;
+      alert(classContext!, "Error", "An error with the database occured changing the time");
+      return false;
     }
 
-    customer!._remainingContractTime = TimeOfDay(hour: hours, minute: minutes);
+    customer!._remainingContractTime = TimeOfDay(hour: newHours, minute: newMinutes);
     notifyListeners();
 
-    return f;
+    return true;
   }
 
   void selectTime(BuildContext context, bool start) async {
