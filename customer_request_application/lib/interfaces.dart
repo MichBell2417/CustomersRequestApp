@@ -1,3 +1,4 @@
+import 'package:customer_request_application/resguardo_de_deposito.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_request_application/classes.dart';
@@ -945,6 +946,7 @@ class BuenoDeHoras extends StatelessWidget {
   final customerSearchController = TextEditingController();
   final startTimeController = TextEditingController();
   late final endTimeController = TextEditingController();
+  
   final SignatureController controllerSAT = SignatureController(
     penStrokeWidth: 1, // Slightly thicker stroke for clearer signatures
     penColor: Colors.black, // Default pen color is black
@@ -1502,76 +1504,6 @@ class BuenoDeHoras extends StatelessWidget {
           ]
         )
       )
-    );
-  }
-}
-
-// ignore: camel_case_types, use_key_in_widget_constructors
-class resguardoDeDeposito extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-    customersController = context.watch<ApplicationController>();
-
-    if (!customersController.connectionStatus) {
-      customersController.classContext = context;
-      customersController.connectionDb();
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: 
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            tileMode: TileMode.clamp,
-            colors: <Color>[Color.fromARGB(0, 255, 255, 255), Color.fromARGB(63, 123, 168, 204), Color.fromARGB(255, 123, 168, 204),Color.fromARGB(255, 123, 168, 204)]),
-          ),
-        ),
-        title: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context, 
-              MaterialPageRoute(
-                builder: (context) {
-                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
-                  return Menu();
-                },
-              ),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.only(right: 10), // Adjust this value to move the text to the left
-            child: Text(
-              'Divermatica',
-              style: TextStyle(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.bold,
-                fontSize: 22, // Optional: Adjust font size if needed
-              ),
-            ),
-          ),
-        ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
-        
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.people,size: 20),
-            onPressed: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (context) {
-                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
-                    return customerView();
-                  },
-                ),
-              );
-            },
-          ),
-        ]
-      ),
     );
   }
 }

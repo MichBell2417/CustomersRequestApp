@@ -3,6 +3,71 @@ import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
 
+class Equipo {
+  int _id;
+  String _tipo;
+  String _marca;
+  String _modello;
+  String? _numeroDiSerie; //Where the customer live
+  bool _garantia; //The type of contract the customers bougth
+  String _descripcionAccesorios; //Remaining contract time for the customer
+  String _descripcion;
+  int _idCliente;
+
+  //BUILDER
+  Equipo(this._id, this._tipo, this._marca, this._modello, this._numeroDiSerie,this._garantia, this._descripcionAccesorios, this._descripcion, this._idCliente);
+  
+  //SETTER
+  void setId(int id) {
+    _id = id;
+  }
+
+  void setTipo(String tipo) {
+    _tipo = tipo;
+  }
+
+  void setMarca(String marca) {
+    _marca = marca;
+  }
+
+  void setModello(String modello) {
+    _modello = modello;
+  }
+
+  void setNumeroDiSerie(String? numeroDiSerie) {
+    _numeroDiSerie = numeroDiSerie;
+  }
+
+  void setGarantia(bool garantia) {
+    _garantia = garantia;
+  }
+
+  void setDescripcionAccesorios(String descripcionAccesorios) {
+    _descripcionAccesorios = descripcionAccesorios;
+  }
+
+  void setDescripcion(String descripcion) {
+    _descripcion = descripcion;
+  }
+
+  void setIdCliente(int idCliente) {
+    _idCliente = idCliente;
+  }
+
+
+  //GETTER
+  get id => _id;
+  get tipo => _tipo;
+  get marca => _marca;  
+  get modello => _modello;
+  get numeroDiSerie => _numeroDiSerie;
+  get garantia => _garantia;
+  get descripcionAccesorios => _descripcionAccesorios;
+  get descripcion => _descripcion;
+  get idCliente => _idCliente;
+}
+
+
 class Customer {
   int _id;
   String _name;
@@ -15,8 +80,7 @@ class Customer {
   String _cp;
 
   //BUILDER
-  Customer(this._id, this._name, this._eMail, this._phoneNumber, this._street,this._remainingContractTime, 
-    this._contractType, this._dni, this._cp);
+  Customer(this._id, this._name, this._eMail, this._phoneNumber, this._street,this._remainingContractTime,this._contractType, this._dni, this._cp);
   
   //SETTER
   void setId(int id) {
@@ -99,6 +163,11 @@ class ApplicationController extends ChangeNotifier {
   List<Customer> customers = [];
   //Costumer
   Customer? customer;
+
+  //Array of Equipos
+  List<Equipo> equipos = [];
+  //Equipo
+  Equipo? equipo;
 
   TimeOfDay _startTime = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _endTime = TimeOfDay(hour: 0, minute: 0);
@@ -314,6 +383,39 @@ class ApplicationController extends ChangeNotifier {
     return false;
   }
 
+  //This methods pulls the devices of a specific customer
+  Future<bool> pullDevicesOfCustomer(int index) async {
+    Results equiposdb;
+    ResultRow equiposLocal;
+    try {
+      equiposdb = await database!.query("SELECT * FROM equipos WHERE id='$index'");
+      equiposLocal = equiposdb.toList().first;
+    } catch (e) {
+      equipo=null;
+      notifyListeners();
+      print("NNOOOOOOOOO!!!");
+      return false;
+    }
+
+    if(equiposLocal.isNotEmpty){
+      equipo = Equipo(
+          equiposLocal['id'],
+          equiposLocal['tipo'],
+          equiposLocal['marca'],
+          equiposLocal['modelo'],
+          equiposLocal['numeroSerie'],
+          equiposLocal['garantia'],
+          equiposLocal['descripcionAccesorios'],
+          equiposLocal['descripcion'],
+          equiposLocal['id_cliente'],
+      );
+    }
+
+    notifyListeners();
+
+    print("PERCHEEEEEEEEEE!!!");
+    return true;
+  }
 //--------------------------------------------------------- Methods for the searching query
   Future<bool> findCustomerFromNumberdb(int index) async {
     Results customerdb;
