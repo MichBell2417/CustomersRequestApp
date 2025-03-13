@@ -29,6 +29,340 @@ class resguardoDeDeposito extends StatelessWidget{
     penColor: Colors.black, // Default pen color is black
     exportBackgroundColor: Colors.transparent, // Transparent background for easier export
   );
+
+  Widget _buildNoDevicesContent(){
+    return Column(
+      children: [
+        SizedBox(height: 16),
+        Container(
+          padding: EdgeInsets.all(5), // Padding around the button to show the dashed border
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 2,
+              color: Colors.grey, // Border color
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ElevatedButton.icon(
+            onPressed: () {
+              // Your onPressed code here
+            },
+            icon: Icon(
+              Icons.add,
+              color: Colors.black, // Icon color
+              size: 28, // Adjust icon size
+            ),
+            label: Text(
+              'Add',
+              style: TextStyle(
+                fontSize: 18, // Larger font size
+                fontWeight: FontWeight.w600, // Bold text for better readability
+                color: Colors.black, // Text color
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(double.infinity, 50), // Make the button take the full width of the parent
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), // Rounded corners
+              ),
+              backgroundColor: Colors.transparent, // Button background color
+              elevation: 0, // Subtle shadow to lift the button
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildSuccessContent(List<Equipo?>? equipo) {
+    return Column(
+      children: [
+        SizedBox(height: 16),
+        Text(
+          "Equipo",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          color: Colors.white,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
+                children: [
+                  SizedBox(height: 16),
+                  Text(
+                    "Equipo",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16), // Padding around the entire content
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
+                          children: [
+                            // First row - "Nombre contrato" and "Horas restantes"
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Tipo:",
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          equipo!.toList().first!.tipo,
+                                          style: TextStyle(fontSize: 16, color: Colors.black),
+                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                          softWrap: true, // Allow text to wrap
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Marca:",
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          equipo.toList().first!.marca, // This can be dynamic and longer if needed
+                                          style: TextStyle(fontSize: 16, color: Colors.black),
+                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                          softWrap: true, // Allow text to wrap
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Spacer between two rows
+                            SizedBox(height: 16),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Modelo:",
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          equipo.toList().first!.modello,
+                                          style: TextStyle(fontSize: 16, color: Colors.black),
+                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                          softWrap: true, // Allow text to wrap
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Numero de Serie:",
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          equipo.toList().first!.numeroDiSerie, // This can be dynamic and longer if needed
+                                          style: TextStyle(fontSize: 16, color: Colors.black),
+                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                          softWrap: true, // Allow text to wrap
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 16),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Accessorios:",
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          equipo.toList().first!.descripcionAccesorios,
+                                          style: TextStyle(fontSize: 16, color: Colors.black),
+                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                          softWrap: true, // Allow text to wrap
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+
+                  /*// Title Text "Garantia"
+                  Text(
+                    "Garantia",
+                    style: TextStyle(
+                      fontSize: 18, // Font size
+                      fontWeight: FontWeight.bold, // Bold text
+                      color: Colors.black, // Teal color to match previous text styling
+                    ),
+                  ),
+
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: ValueListenableBuilder<SingingCharacter?>(
+                          valueListenable: radioButtonSelectionNotifier,
+                          builder: (context, selectedValue, _) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround, // Align items evenly
+                              children: [
+                                // Custom Radio for SI
+                                Row(
+                                  children: [
+                                    Radio<SingingCharacter>(
+                                      value: SingingCharacter.si,
+                                      groupValue: selectedValue,
+                                      onChanged: (SingingCharacter? value) {
+                                        radioButtonSelectionNotifier.value = value;
+                                      },
+                                    ),
+                                    Text("SI", style: TextStyle(fontSize: 16,color: Colors.black)),
+                                  ],
+                                ),
+                                // Custom Radio for NO
+                                Row(
+                                  children: [
+                                    Radio<SingingCharacter>(
+                                      value: SingingCharacter.no,
+                                      groupValue: selectedValue,
+                                      onChanged: (SingingCharacter? value) {
+                                        radioButtonSelectionNotifier.value = value;
+                                      },
+                                    ),
+                                    Text("NO", style: TextStyle(fontSize: 16,color: Colors.black)),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Title Text "Equipo"
+                  Text(
+                    "Trabajo a realizar segun cliente",
+                    style: TextStyle(
+                      fontSize: 18, // Font size
+                      fontWeight: FontWeight.bold, // Bold text
+                      color: Colors.black, // Teal color to match previous text styling
+                    ),
+                  ),
+                  
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        controller: descriptionController,
+                        maxLines: null, // Allows the text to grow and go to the next line
+                        minLines: 1, // Minimum lines (initially 1 line)
+                        decoration: InputDecoration(
+                          hintText: "Enter Description...",
+                          hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
+                          contentPadding: EdgeInsets.symmetric(vertical: 30, horizontal: 16), // Padding inside the text field
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
+                          ),
+                          enabledBorder: InputBorder.none, // Remove enabled border
+                        ),
+                      ),
+                    ),
+                  ),*/
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
     
   @override
   Widget build(BuildContext context){
@@ -326,344 +660,48 @@ class resguardoDeDeposito extends StatelessWidget{
 
               ),
             ),
-            /*FutureBuilder<bool>(
-              future: customersController.pullDevicesOfCustomer(customersController.customer!.id), // Il tuo Future<bool>
+            FutureBuilder<List<Equipo?>?>(
+              future: customersController.pullDevicesOfCustomer(customersController.customer!.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Mostra un indicatore di caricamento mentre aspetti il risultato del Future
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  // Mostra un errore se c'è un problema nel Future
-                  return Center(child: Text('Errore: ${snapshot.error}'));
-                } else if (snapshot.hasData && snapshot.data == true) {
-                  // Se il Future ritorna true, mostra il contenuto
-                  return Column(
-                    children: [
-                      SizedBox(height: 16),
-                      Text(
-                        "Equipo",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        color: Colors.white,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Tipo:",
-                                            style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                            softWrap: true,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Flexible(
-                                            child: Text(
-                                              customersController.customer!.name,
-                                              style: TextStyle(fontSize: 16, color: Colors.black),
-                                              overflow: TextOverflow.ellipsis,
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // Altri widget simili...
-                                  ],
-                                ),
-                                SizedBox(height: 16),
-                                // Altri contenuti qui...
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Show loading indicator while fetching data
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(height: 20),
+                        CircularProgressIndicator(),
+                        SizedBox(height: 20),
+                        Text('Searching the equipos of this customer...')
+                      ],
+                    ),
                   );
+                }else if (snapshot.hasError) {
+                  // Show error message if there is an issue fetching data
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.connectionState == ConnectionState.done) {
+                  // If the future is done, check if we have data
+                  if (snapshot.hasData) {
+                    final equipo = snapshot.data;
+                    // If we have a valid Equipo, show its content
+                    if(equipo != null){
+                      return _buildSuccessContent(equipo);  // You need to pass the Equipos to this function
+                    }else{
+                      return _buildNoDevicesContent();
+                    }
+                  } else {
+                    // If no data is found (snapshot.data is null)
+                    return _buildNoDevicesContent();
+                  }
                 } else {
-                  // Se il Future ritorna false, non mostrare nulla o mostra una notifica
-                  return Center(child: Text('Nessun dispositivo disponibile.'));
+                  // Fallback for unexpected states
+                  return Center(child: Text('Unknown state'));
                 }
               },
-            ),*/
-            
-            SizedBox(height: 16),
-            
-            // Title Text "Equipo"
-            Text(
-              "Equipo",
-              style: TextStyle(
-                fontSize: 18, // Font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.black, // Teal color to match previous text styling
-              ),
-            ),
+            )
 
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16), // Padding around the entire content
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
-                    children: [
-                      // First row - "Nombre contrato" and "Horas restantes"
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Tipo:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.name,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Marca:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.eMail, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      // Spacer between two rows
-                      SizedBox(height: 16),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Modelo:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.phoneNumber,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Numero de Serie:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.dni, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      SizedBox(height: 16),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Accessorios:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.street,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ),
-            ),
-            
-            SizedBox(height: 16),
-
-            // Title Text "Garantia"
-            Text(
-              "Garantia",
-              style: TextStyle(
-                fontSize: 18, // Font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.black, // Teal color to match previous text styling
-              ),
-            ),
-
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ValueListenableBuilder<SingingCharacter?>(
-                    valueListenable: radioButtonSelectionNotifier,
-                    builder: (context, selectedValue, _) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround, // Align items evenly
-                        children: [
-                          // Custom Radio for SI
-                          Row(
-                            children: [
-                              Radio<SingingCharacter>(
-                                value: SingingCharacter.si,
-                                groupValue: selectedValue,
-                                onChanged: (SingingCharacter? value) {
-                                  radioButtonSelectionNotifier.value = value;
-                                },
-                              ),
-                              Text("SI", style: TextStyle(fontSize: 16,color: Colors.black)),
-                            ],
-                          ),
-                          // Custom Radio for NO
-                          Row(
-                            children: [
-                              Radio<SingingCharacter>(
-                                value: SingingCharacter.no,
-                                groupValue: selectedValue,
-                                onChanged: (SingingCharacter? value) {
-                                  radioButtonSelectionNotifier.value = value;
-                                },
-                              ),
-                              Text("NO", style: TextStyle(fontSize: 16,color: Colors.black)),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 16),
-
-            // Title Text "Equipo"
-            Text(
-              "Trabajo a realizar segun cliente",
-              style: TextStyle(
-                fontSize: 18, // Font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.black, // Teal color to match previous text styling
-              ),
-            ),
-            
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextFormField(
-                  controller: descriptionController,
-                  maxLines: null, // Allows the text to grow and go to the next line
-                  minLines: 1, // Minimum lines (initially 1 line)
-                  decoration: InputDecoration(
-                    hintText: "Enter Description...",
-                    hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
-                    contentPadding: EdgeInsets.symmetric(vertical: 30, horizontal: 16), // Padding inside the text field
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
-                    ),
-                    enabledBorder: InputBorder.none, // Remove enabled border
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 16),
+            /*SizedBox(height: 16),
 
             Text(
               "Conformidad",
@@ -782,7 +820,7 @@ class resguardoDeDeposito extends StatelessWidget{
                   ),
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
       )

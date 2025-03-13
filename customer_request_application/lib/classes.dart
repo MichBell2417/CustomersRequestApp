@@ -8,8 +8,8 @@ class Equipo {
   String _tipo;
   String _marca;
   String _modello;
-  String? _numeroDiSerie; //Where the customer live
-  bool _garantia; //The type of contract the customers bougth
+  String _numeroDiSerie; //Where the customer live
+  int _garantia; //The type of contract the customers bougth
   String _descripcionAccesorios; //Remaining contract time for the customer
   String _descripcion;
   int _idCliente;
@@ -34,11 +34,11 @@ class Equipo {
     _modello = modello;
   }
 
-  void setNumeroDiSerie(String? numeroDiSerie) {
+  void setNumeroDiSerie(String numeroDiSerie) {
     _numeroDiSerie = numeroDiSerie;
   }
 
-  void setGarantia(bool garantia) {
+  void setGarantia(int garantia) {
     _garantia = garantia;
   }
 
@@ -383,22 +383,25 @@ class ApplicationController extends ChangeNotifier {
     return false;
   }
 
-  //This methods pulls the devices of a specific customer
-  Future<bool> pullDevicesOfCustomer(int index) async {
-    Results equiposdb;
-    ResultRow equiposLocal;
-    try {
-      equiposdb = await database!.query("SELECT * FROM equipos WHERE id='$index'");
-      equiposLocal = equiposdb.toList().first;
-    } catch (e) {
-      equipo=null;
-      notifyListeners();
-      print("NNOOOOOOOOO!!!");
-      return false;
-    }
+  Future<List<Equipo?>?> pullDevicesOfCustomer(int index) async {
+    // Simulate a delay (e.g., network request or database query)
+    await Future.delayed(Duration(seconds: 5)); // Simulate a delay
 
-    if(equiposLocal.isNotEmpty){
-      equipo = Equipo(
+    Results equiposdb;
+
+    try {
+      // Query the database for devices (replace with your actual query)
+      equiposdb = await database!.query("SELECT * FROM equipos WHERE id_cliente='$index'");
+      if (equiposdb.isEmpty) {
+        return null;  // No devices found
+      }
+    } catch (e) {
+      return null;  // Return null in case of an error
+    }
+    
+    for (var equiposLocal in equiposdb) {
+      equipos.add(
+        Equipo(
           equiposLocal['id'],
           equiposLocal['tipo'],
           equiposLocal['marca'],
@@ -408,14 +411,13 @@ class ApplicationController extends ChangeNotifier {
           equiposLocal['descripcionAccesorios'],
           equiposLocal['descripcion'],
           equiposLocal['id_cliente'],
+        )
       );
     }
-
-    notifyListeners();
-
-    print("PERCHEEEEEEEEEE!!!");
-    return true;
+    
+    return equipos;  // Return the Equipo object
   }
+
 //--------------------------------------------------------- Methods for the searching query
   Future<bool> findCustomerFromNumberdb(int index) async {
     Results customerdb;
