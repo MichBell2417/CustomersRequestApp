@@ -132,6 +132,11 @@ class Customer {
     return ApplicationController.timeInString(
         _remainingContractTime.hour, _remainingContractTime.minute);
   }
+  
+  @override
+  String toString() {
+    return 'Customer(name: $name, dni: $dni)';
+  }
 }
 
 class ContractType {
@@ -177,16 +182,19 @@ class ApplicationController extends ChangeNotifier {
 
   BuildContext? classContext;
   bool connectionStatus = false; //To track the status of the connection
+
   // ignore: non_constant_identifier_names
   String IPaddress = "192.168.0.146"; //The IP address of the computer where there is the mariaDB server
   MySqlConnection? database;
   String selectedContract = "";
+  String _isInGarantia = "";
 
   int _serviceInShop = 0;
 
   //GETTER
   get startTime => timeInString(_startTime.hour, _startTime.minute);
   get endTime => timeInString(_endTime.hour, _endTime.minute);
+  get isInGarantia => _isInGarantia;
 
   //SETTER
   void setStartName(TimeOfDay startTime) {
@@ -199,6 +207,10 @@ class ApplicationController extends ChangeNotifier {
 
   void setCustomer(Customer customer){
     this.customer = customer;
+  }
+
+  void setGarantia(String garantia){
+    _isInGarantia = garantia;
   }
 
   //Methods to change TimeOfDay in String

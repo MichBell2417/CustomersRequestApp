@@ -424,7 +424,7 @@ class customerView extends StatelessWidget{
         ),
         leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
         
-        actions: <Widget>[
+        /*actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.computer),
             onPressed: () {
@@ -432,14 +432,14 @@ class customerView extends StatelessWidget{
                 context, 
                 MaterialPageRoute(
                   builder: (context) {
-                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    customersController.customer = null;
                     return resguardoDeDeposito();
                   },
                 ),
               );
             },
           ),
-        ]
+        ]*/
       ),
       body: Column(
         children: [
@@ -940,8 +940,7 @@ enum SingingCharacter { casa, tienda }
 
 // ignore: must_be_immutable, use_key_in_widget_constructors
 class BuenoDeHoras extends StatelessWidget {
-  ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);  
-  SingingCharacter? radioButtonSelection;
+  ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
 
   final customerSearchController = TextEditingController();
   final startTimeController = TextEditingController();
@@ -1056,14 +1055,14 @@ class BuenoDeHoras extends StatelessWidget {
         
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios,size: 20),
+            icon: const Icon(Icons.computer,size: 20),
             onPressed: () {
               Navigator.push(
                 context, 
                 MaterialPageRoute(
                   builder: (context) {
-                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
-                    return customerView();
+                    customersController.customer = null;
+                    return resguardoDeDeposito();
                   },
                 ),
               );
@@ -1332,7 +1331,6 @@ class BuenoDeHoras extends StatelessWidget {
                           onPressed: () async {
                             bool success = await customersController.removeHours(customersController.customer!.dni);
 
-                            radioButtonSelection = null;
                             radioButtonSelectionNotifier.value=null;
                             customersController.setStartName(TimeOfDay(hour: 0, minute: 0));
                             customersController.setEndTime(TimeOfDay(hour: 0, minute: 0));

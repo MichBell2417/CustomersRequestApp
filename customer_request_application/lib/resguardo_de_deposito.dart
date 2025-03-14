@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:customer_request_application/interfaces.dart';
 import 'package:provider/provider.dart';
+import 'package:customer_request_application/interfaces.dart';
 import 'package:customer_request_application/classes.dart';
-import 'package:signature/signature.dart';
+import 'package:customer_request_application/add_equipo.dart';
 
 ///Global variable and methods
 late ApplicationController customersController;
@@ -18,55 +18,78 @@ enum SingingCharacter { si, no }
 class resguardoDeDeposito extends StatelessWidget{
   ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
 
-  final SignatureController controllerSAT = SignatureController(
-    penStrokeWidth: 1, // Slightly thicker stroke for clearer signatures
-    penColor: Colors.black, // Default pen color is black
-    exportBackgroundColor: Colors.transparent, // Transparent background for easier export
-  );
-  //The canvas for the customer signature
-  final SignatureController controllerCustomers = SignatureController(
-    penStrokeWidth:  1,  // Slightly thicker stroke for clearer signatures
-    penColor: Colors.black, // Default pen color is black
-    exportBackgroundColor: Colors.transparent, // Transparent background for easier export
-  );
-
-  Widget _buildNoDevicesContent(){
+  final ValueNotifier<Customer?> selectedCustomerNotifier = ValueNotifier<Customer?>(null);
+  Widget _buildNoDevicesContent(BuildContext context){
     return Column(
       children: [
         SizedBox(height: 16),
+
+        Text(
+          "No equipos are associated with this customer.",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],  // Slightly lighter color for subtle appearance
+            fontWeight: FontWeight.w500,  // Medium weight for the font
+            letterSpacing: 0.5,  // Adds a little bit of spacing between letters
+          ),
+          textAlign: TextAlign.center,  // Centers the text
+        ),
+        
+        SizedBox(height: 16),
+        
+        Text(
+          "You want to add one?",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],  // Slightly lighter color for subtle appearance
+            fontWeight: FontWeight.w500,  // Medium weight for the font
+            letterSpacing: 0.5,  // Adds a little bit of spacing between letters
+          ),
+          textAlign: TextAlign.center,  // Centers the text
+        ),
+
         Container(
-          padding: EdgeInsets.all(5), // Padding around the button to show the dashed border
+          padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
             border: Border.all(
               width: 2,
-              color: Colors.grey, // Border color
+              color: Colors.grey,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: ElevatedButton.icon(
             onPressed: () {
-              // Your onPressed code here
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) {
+                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    return AddEquipo();
+                  },
+                ),
+              );
             },
             icon: Icon(
               Icons.add,
-              color: Colors.black, // Icon color
-              size: 28, // Adjust icon size
+              color: Colors.black,
+              size: 28,
             ),
             label: Text(
-              'Add',
+              'Add equipo',
               style: TextStyle(
-                fontSize: 18, // Larger font size
-                fontWeight: FontWeight.w600, // Bold text for better readability
-                color: Colors.black, // Text color
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
             ),
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50), // Make the button take the full width of the parent
+              minimumSize: Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12), // Rounded corners
+                borderRadius: BorderRadius.circular(12),
               ),
-              backgroundColor: Colors.transparent, // Button background color
-              elevation: 0, // Subtle shadow to lift the button
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.transparent,
+              elevation: 0,
             ),
           ),
         ),
@@ -253,108 +276,6 @@ class resguardoDeDeposito extends StatelessWidget{
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 16),
-
-                  /*// Title Text "Garantia"
-                  Text(
-                    "Garantia",
-                    style: TextStyle(
-                      fontSize: 18, // Font size
-                      fontWeight: FontWeight.bold, // Bold text
-                      color: Colors.black, // Teal color to match previous text styling
-                    ),
-                  ),
-
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    color: Colors.white,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: ValueListenableBuilder<SingingCharacter?>(
-                          valueListenable: radioButtonSelectionNotifier,
-                          builder: (context, selectedValue, _) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround, // Align items evenly
-                              children: [
-                                // Custom Radio for SI
-                                Row(
-                                  children: [
-                                    Radio<SingingCharacter>(
-                                      value: SingingCharacter.si,
-                                      groupValue: selectedValue,
-                                      onChanged: (SingingCharacter? value) {
-                                        radioButtonSelectionNotifier.value = value;
-                                      },
-                                    ),
-                                    Text("SI", style: TextStyle(fontSize: 16,color: Colors.black)),
-                                  ],
-                                ),
-                                // Custom Radio for NO
-                                Row(
-                                  children: [
-                                    Radio<SingingCharacter>(
-                                      value: SingingCharacter.no,
-                                      groupValue: selectedValue,
-                                      onChanged: (SingingCharacter? value) {
-                                        radioButtonSelectionNotifier.value = value;
-                                      },
-                                    ),
-                                    Text("NO", style: TextStyle(fontSize: 16,color: Colors.black)),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Title Text "Equipo"
-                  Text(
-                    "Trabajo a realizar segun cliente",
-                    style: TextStyle(
-                      fontSize: 18, // Font size
-                      fontWeight: FontWeight.bold, // Bold text
-                      color: Colors.black, // Teal color to match previous text styling
-                    ),
-                  ),
-                  
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    color: Colors.white,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextFormField(
-                        controller: descriptionController,
-                        maxLines: null, // Allows the text to grow and go to the next line
-                        minLines: 1, // Minimum lines (initially 1 line)
-                        decoration: InputDecoration(
-                          hintText: "Enter Description...",
-                          hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
-                          contentPadding: EdgeInsets.symmetric(vertical: 30, horizontal: 16), // Padding inside the text field
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
-                          ),
-                          enabledBorder: InputBorder.none, // Remove enabled border
-                        ),
-                      ),
-                    ),
-                  ),*/
                 ],
               ),
             ),
@@ -391,7 +312,7 @@ class resguardoDeDeposito extends StatelessWidget{
               context, 
               MaterialPageRoute(
                 builder: (context) {
-                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                  customersController.customer = null;
                   return Menu();
                 },
               ),
@@ -419,7 +340,7 @@ class resguardoDeDeposito extends StatelessWidget{
                 context, 
                 MaterialPageRoute(
                   builder: (context) {
-                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    customersController.customer = null;
                     return customerView();
                   },
                 ),
@@ -429,7 +350,9 @@ class resguardoDeDeposito extends StatelessWidget{
         ]
       ),
       
-      body: SingleChildScrollView(
+      body:
+      customersController.customer !=null ? //checks if there is a customer to show
+      SingleChildScrollView(
         padding: EdgeInsets.all(22), // Distance from the walls of the page
         child: Column(
           children: [
@@ -687,11 +610,25 @@ class resguardoDeDeposito extends StatelessWidget{
                     if(equipo != null){
                       return _buildSuccessContent(equipo);  // You need to pass the Equipos to this function
                     }else{
-                      return _buildNoDevicesContent();
+                      return Center(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context, 
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                                  return AddEquipo();
+                                },
+                              ),
+                            );
+                          },label: Icon(Icons.add),
+                        )
+                      );
                     }
                   } else {
                     // If no data is found (snapshot.data is null)
-                    return _buildNoDevicesContent();
+                    return _buildNoDevicesContent(context);
                   }
                 } else {
                   // Fallback for unexpected states
@@ -699,131 +636,79 @@ class resguardoDeDeposito extends StatelessWidget{
                 }
               },
             )
-
-
-            /*SizedBox(height: 16),
-
-            Text(
-              "Conformidad",
-              style: TextStyle(
-                fontSize: 18, // Font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.black, // Teal color to match previous text styling
-              ),
-            ),
-
-            // Signature section
-            Card(
-              elevation: 6, // Slightly more elevated for a floating effect
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // Black border
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16), // Increased padding around the card content
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Left-align text for a cleaner look
-                    children: [
-                      // SAT Signature
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16), // Increased bottom padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Firma SAT", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                            ElevatedButton(
-                              onPressed: () {
-                                controllerSAT.clear();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // White background
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20), // Reduced padding
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), // Slightly sharper rounded corners
-                                elevation: 4, // Slight shadow for a floating effect
-                              ),
-                              child: Text("Limpia", style: TextStyle(fontSize: 14, color: Colors.black)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),  // Padding around the canvas for spacing
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Light grey background to distinguish from white
-                          borderRadius: BorderRadius.circular(12), // Rounded corners for the container
-                          boxShadow: [
-                            BoxShadow(
-                              // ignore: deprecated_member_use
-                              color: Colors.black.withOpacity(0.1), // Lighter shadow for depth
-                              spreadRadius: 1,
-                              blurRadius: 6,
-                              offset: Offset(0, 2), // Shadow offset
-                            ),
-                          ],
-                        ),
-                        child: Signature(
-                          controller: controllerSAT,
-                          width: 400, // Reduced width for a more compact signature area
-                          height: 180, // Reduced height for a more compact signature area
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-
-                      // Customer Signature
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16, bottom: 16), // Increased padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Firma Cliente", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                            ElevatedButton(
-                              onPressed: () {
-                                controllerCustomers.clear();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // White background
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20), // Consistent padding
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), // Slightly sharper rounded corners
-                                elevation: 4, // Slight shadow for a floating effect
-                              ),
-                              child: Text("Limpia", style: TextStyle(fontSize: 14, color: Colors.black)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),  // Padding around the canvas for spacing
-                        decoration: BoxDecoration(
-                          color: Colors.white, // Light grey background to distinguish from white
-                          borderRadius: BorderRadius.circular(12), // Rounded corners for the container
-                          boxShadow: [
-                            BoxShadow(
-                              // ignore: deprecated_member_use
-                              color: Colors.black.withOpacity(0.1), // Lighter shadow for depth
-                              spreadRadius: 1,
-                              blurRadius: 6,
-                              offset: Offset(0, 2), // Shadow offset
-                            ),
-                          ],
-                        ),
-                        child: Signature(
-                          controller: controllerCustomers,
-                          width: 400, // Reduced width for a more compact signature area
-                          height: 180, // Reduced height for a more compact signature area
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),*/
           ],
         ),
-      )
+      ) : 
+      SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Text for the dropdown prompt
+            Text(
+              'Select a customer:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+
+            // ListView to select a customer
+            ValueListenableBuilder<Customer?>(
+              valueListenable: selectedCustomerNotifier,
+              builder: (context, selectedCustomer, _) {
+                return Column(
+                  children: customersController.customers.map((item) {
+                    return GestureDetector(
+                      onTap: () {
+                        // Update the selected customer when tapped
+                        selectedCustomerNotifier.value = item;
+                        customersController.customer = item;
+                      },
+                      child: Card(
+                        color: selectedCustomer == item
+                            // ignore: deprecated_member_use
+                            ? Colors.blueAccent.withOpacity(0.2)  // Highlight selected customer
+                            : Colors.white,
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          leading: Icon(Icons.info_outline, size: 20,color: Colors.blueAccent,),
+                          title: Text('${item.name} - ${item.dni}'),
+                          subtitle: Text('Tap to select'),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+
+            SizedBox(height: 20),
+
+            // Display the selected customer details
+            ValueListenableBuilder<Customer?>(
+              valueListenable: selectedCustomerNotifier,
+              builder: (context, selectedCustomer, _) {
+                // If a customer is selected, navigate to the AddEquipo screen
+                if (selectedCustomer != null) {
+                  // Use WidgetsBinding to ensure the navigation happens after the build is complete
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          // You can pass the selected customer to the AddEquipo screen if needed
+                          return resguardoDeDeposito();
+                        },
+                      ),
+                    );
+                  });
+                }
+                return Container(); // Return an empty container if no customer is selected
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
