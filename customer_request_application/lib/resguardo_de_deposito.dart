@@ -97,193 +97,268 @@ class resguardoDeDeposito extends StatelessWidget{
     );
   }
   
-  Widget _buildSuccessContent(List<Equipo?>? equipo) {
+  Widget _buildSuccessContent(List<Equipo?>? equipos,BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center, // Align everything to the start
       children: [
         SizedBox(height: 16),
         Text(
-          "Equipo",
+          "Equipos",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
-        Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          color: Colors.white,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
-                children: [
-                  SizedBox(height: 16),
-                  Text(
-                    "Equipo",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+        SizedBox(height: 16),
+
+        // Iterate through the list of equipos and generate a Card for each
+        ...equipos!.map(
+          (equipo) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16), // Padding between each equipment card
+              child: GestureDetector(
+                onTap: () {
+                  print(equipos.length);
+                  // Your onTap action here, for example:
+                  print("Tapped on equipo with tipo: ${equipo?.numeroSerie}");
+
+                  // You can perform other actions here, such as navigating to a detail screen:
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => EquipoDetailScreen(equipo: equipo)));
+                },
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  color: Colors.white,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color.fromARGB(172, 0, 0, 0), width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // First row - Tipo and Marca
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Tipo:",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.tipo ?? 'N/A',
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Marca:",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.marca ?? 'N/A', // This can be dynamic and longer if needed
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+
+                          // Second row - Modelo and Numero di Serie
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Modelo:",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.modelo ?? 'N/A',
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Número de Serie: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.numeroSerie ?? 'N/A', // This can be dynamic and longer if needed
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+
+                          // Last row - Accesorios
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Accesorios: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.descripcionAccesorios ?? 'N/A',
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Is In Garantia: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        equipo?.garantia == 1 ? "SI" : "NO", // This can be dynamic and longer if needed
+                                        style: TextStyle(fontSize: 16, color: Colors.black),
+                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                        softWrap: true, // Allow text to wrap
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    color: Colors.white,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(16), // Padding around the entire content
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
-                          children: [
-                            // First row - "Nombre contrato" and "Horas restantes"
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Tipo:",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          equipo!.toList().first!.tipo,
-                                          style: TextStyle(fontSize: 16, color: Colors.black),
-                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                          softWrap: true, // Allow text to wrap
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Marca:",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          equipo.toList().first!.marca, // This can be dynamic and longer if needed
-                                          style: TextStyle(fontSize: 16, color: Colors.black),
-                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                          softWrap: true, // Allow text to wrap
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            // Spacer between two rows
-                            SizedBox(height: 16),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Modelo:",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          equipo.toList().first!.modello,
-                                          style: TextStyle(fontSize: 16, color: Colors.black),
-                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                          softWrap: true, // Allow text to wrap
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Numero de Serie:",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          equipo.toList().first!.numeroDiSerie, // This can be dynamic and longer if needed
-                                          style: TextStyle(fontSize: 16, color: Colors.black),
-                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                          softWrap: true, // Allow text to wrap
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 16),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Accessorios:",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          equipo.toList().first!.descripcionAccesorios,
-                                          style: TextStyle(fontSize: 16, color: Colors.black),
-                                          overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                          softWrap: true, // Allow text to wrap
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
+            );
+          }
+        ),
+
+        SizedBox(height: 16),
+
+        Text(
+          "You want to add another one?",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],  // Slightly lighter color for subtle appearance
+            fontWeight: FontWeight.w500,  // Medium weight for the font
+            letterSpacing: 0.5,  // Adds a little bit of spacing between letters
+          ),
+          textAlign: TextAlign.center,  // Centers the text
+        ),
+
+        Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 2,
+              color: Colors.grey,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) {
+                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
+                    return AddEquipo();
+                  },
+                ),
+              );
+            },
+            icon: Icon(
+              Icons.add,
+              color: Colors.black,
+              size: 28,
+            ),
+            label: Text(
+              'Add equipo',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.transparent,
+              elevation: 0,
             ),
           ),
         ),
+
       ],
     );
   }
+
+
     
   @override
   Widget build(BuildContext context){
@@ -360,9 +435,9 @@ class resguardoDeDeposito extends StatelessWidget{
             Text(
               "Cliente",
               style: TextStyle(
-                fontSize: 18, // Font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.black, // Teal color to match previous text styling
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
             // Card displaying contract type and remaining hours
@@ -608,7 +683,7 @@ class resguardoDeDeposito extends StatelessWidget{
                     final equipo = snapshot.data;
                     // If we have a valid Equipo, show its content
                     if(equipo != null){
-                      return _buildSuccessContent(equipo);  // You need to pass the Equipos to this function
+                      return _buildSuccessContent(equipo,context);  // You need to pass the Equipos to this function
                     }else{
                       return Center(
                         child: ElevatedButton.icon(

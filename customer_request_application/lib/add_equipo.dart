@@ -11,6 +11,12 @@ late ApplicationController customersController;
 // ignore: non_constant_identifier_names
 final descriptionController = TextEditingController();
 
+final tipoController = TextEditingController();
+final marcaController = TextEditingController();
+final modeloController = TextEditingController();
+final numeroSerieController = TextEditingController();
+final descriptionAccessoriosController = TextEditingController();
+
 
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { si, no }
@@ -105,15 +111,202 @@ class AddEquipo extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /*---------TODO-------------TextField
+              SizedBox(height: 16),
+              Text(
+                "Equipo",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              Card(
+                elevation: 6,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Colors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1), // Bordo nero sottile
+                    borderRadius: BorderRadius.circular(12), // Stessa curvatura del Card
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0), // Padding for the entire Card content
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Tipo field
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0), // Spacing between fields
+                          child: Row(
+                            children: [
+                              Text(
+                                "Tipo: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(width: 8), // Space between label and input
+                              Expanded(
+                                child: TextFormField(
+                                  controller: tipoController,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter tipo",
+                                    hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
+                                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Padding for the text field
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
+                        // Marca field
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0), // Spacing between fields
+                          child: Row(
+                            children: [
+                              Text(
+                                "Marca: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(width: 8), // Space between label and input
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text, // Adjust if needed
+                                  controller: marcaController,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter marca",
+                                    hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
+                                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Padding for the text field
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
+                        //Modelo
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0), // Spacing between fields
+                          child: Row(
+                            children: [
+                              Text(
+                                "Modelo: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(width: 8), // Space between label and input
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text, // Adjust if needed
+                                  controller: modeloController,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter modelo",
+                                    hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
+                                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Padding for the text field
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        //Numero di serie
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0), // Spacing between fields
+                          child: Row(
+                            children: [
+                              Text(
+                                "Numero di serie: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(width: 8), // Space between label and input
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text, // Adjust if needed
+                                  controller: numeroSerieController,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter numero di serie",
+                                    hintStyle: TextStyle(color: Colors.grey[600]), // Hint text style
+                                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16), // Padding for the text field
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0), // Focused border
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ),
 
+              SizedBox(height: 16),
 
+              // Description input field
+              Text(
+                "Tienes otro accessorios",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Colors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextFormField(
+                    controller: descriptionAccessoriosController,
+                    maxLines: null,
+                    minLines: 1,
+                    decoration: InputDecoration(
+                      hintText: "Enter Accessorios...",
+                      hintStyle: TextStyle(color: Colors.grey[600]),
+                      contentPadding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: const Color.fromARGB(255, 29, 68, 134), width: 2.0),
+                      ),
+                      enabledBorder: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+              
+              SizedBox(height: 16),
 
-
-
-              */
               Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: Column(
@@ -150,6 +343,7 @@ class AddEquipo extends StatelessWidget {
                                     value: SingingCharacter.si,
                                     groupValue: selectedValue,
                                     onChanged: (SingingCharacter? value) {
+                                      customersController.setGarantia(1);
                                       radioButtonSelectionNotifier.value = value;
                                     },
                                   ),
@@ -164,6 +358,7 @@ class AddEquipo extends StatelessWidget {
                                     value: SingingCharacter.no,
                                     groupValue: selectedValue,
                                     onChanged: (SingingCharacter? value) {
+                                      customersController.setGarantia(0);
                                       radioButtonSelectionNotifier.value = value;
                                     },
                                   ),
@@ -333,6 +528,57 @@ class AddEquipo extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                ),
+              ),
+              
+              SizedBox(height: 16),
+
+              Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: Colors.grey,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if(controllerCustomers.isNotEmpty && controllerSAT.isNotEmpty){
+                      customersController.addDevice(tipoController.text, marcaController.text, modeloController.text, numeroSerieController.text, descriptionController.text, descriptionAccessoriosController.text);
+                      customersController.alert(context,  "Saved", "The EQUIPO has been saved in the database.");
+                      
+                      Navigator.pop(context);
+                    }else{
+                      customersController.alert(
+                        context,
+                        "Error",
+                        "You need to sign."
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.save,
+                    color: Colors.black,
+                    size: 28,
+                  ),
+                  label: Text(
+                    'Save equipo',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.transparent,
+                    elevation: 0,
                   ),
                 ),
               ),

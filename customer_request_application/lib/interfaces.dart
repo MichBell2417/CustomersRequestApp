@@ -75,7 +75,7 @@ Widget textfieldCustomer = Column(
               keyboardType: TextInputType.phone,
               controller: numeroDeTelefonoController,
               decoration: InputDecoration(
-                hintText: "Enter phone number",
+                hintText: "Enter Número telefónico",
                 hintStyle: TextStyle(color: Colors.grey[600]),
                 contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 focusedBorder: OutlineInputBorder(
@@ -138,7 +138,7 @@ Widget textfieldCustomer = Column(
             child: TextFormField(
               controller: streetController,
               decoration: InputDecoration(
-                hintText: "Enter address",
+                hintText: "Enter Dirección",
                 hintStyle: TextStyle(color: Colors.grey[600]),
                 contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 focusedBorder: OutlineInputBorder(
