@@ -228,8 +228,9 @@ void cleanTextField(){
 }
 
 ///--------------------------------Class with the interface for the menu
-// ignore: use_key_in_widget_constructors
 class Menu extends StatelessWidget{
+  const Menu({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +290,7 @@ class Menu extends StatelessWidget{
                 child: ElevatedButton(
                   onPressed: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return customerView();
+                      return CustomerView();
                     }));
                   },
                   style: ElevatedButton.styleFrom(
@@ -312,7 +313,7 @@ class Menu extends StatelessWidget{
                 child: ElevatedButton(
                   onPressed: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return resguardoDeDeposito();
+                      return ResguardoDeDeposito();
                     }));
                   },style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white, // Background color
@@ -358,12 +359,11 @@ class Menu extends StatelessWidget{
 }
 
 ///-------------------------------- class with the interface to control the customers
-// ignore: camel_case_types
-class customerView extends StatelessWidget{
+class CustomerView extends StatelessWidget{
   
   final customerSearchController = TextEditingController();
 
-  customerView({super.key});
+  CustomerView({super.key});
   
   // Helper method to reduce redundancy in row styling
   Widget _buildCustomerInfoRow(String label, String value) {
@@ -938,8 +938,10 @@ class customerView extends StatelessWidget{
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { casa, tienda }
 
-// ignore: must_be_immutable, use_key_in_widget_constructors
+// ignore: must_be_immutable
 class BuenoDeHoras extends StatelessWidget {
+  BuenoDeHoras({super.key});
+  
   ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
 
   final customerSearchController = TextEditingController();
@@ -1062,7 +1064,7 @@ class BuenoDeHoras extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     customersController.customer = null;
-                    return resguardoDeDeposito();
+                    return ResguardoDeDeposito();
                   },
                 ),
               );

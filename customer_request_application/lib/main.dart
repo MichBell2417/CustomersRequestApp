@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   runApp(PrincipalPage());
 }
-
+  
 class PrincipalPage extends StatelessWidget {
   const PrincipalPage({super.key});
 

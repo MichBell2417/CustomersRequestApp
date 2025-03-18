@@ -1,3 +1,4 @@
+import 'package:customer_request_application/detail_equipo.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_request_application/interfaces.dart';
@@ -14,11 +15,15 @@ final descriptionController = TextEditingController();
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { si, no }
 
-// ignore: camel_case_types, use_key_in_widget_constructors, must_be_immutable
-class resguardoDeDeposito extends StatelessWidget{
+
+// ignore: must_be_immutable
+class ResguardoDeDeposito extends StatelessWidget{
+  ResguardoDeDeposito({super.key});
+
   ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
 
   final ValueNotifier<Customer?> selectedCustomerNotifier = ValueNotifier<Customer?>(null);
+
   Widget _buildNoDevicesContent(BuildContext context){
     return Column(
       children: [
@@ -119,12 +124,10 @@ class resguardoDeDeposito extends StatelessWidget{
               padding: const EdgeInsets.only(bottom: 16), // Padding between each equipment card
               child: GestureDetector(
                 onTap: () {
-                  print(equipos.length);
-                  // Your onTap action here, for example:
-                  print("Tapped on equipo with tipo: ${equipo?.numeroSerie}");
-
-                  // You can perform other actions here, such as navigating to a detail screen:
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => EquipoDetailScreen(equipo: equipo)));
+                  /*print(equipos.length);
+                  print("Tapped on equipo with tipo: ${equipo?.numeroSerie}");*/
+                  customersController.equipo = equipo;
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailEquipo()));
                 },
                 child: Card(
                   elevation: 4,
@@ -246,35 +249,14 @@ class resguardoDeDeposito extends StatelessWidget{
                                   children: [
                                     SizedBox(width: 10),
                                     Text(
-                                      "Accesorios: ",
+                                      "Is In Garantia: ",
                                       style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
                                       softWrap: true, // Allow text to wrap
                                     ),
                                     SizedBox(width: 10),
                                     Flexible(
                                       child: Text(
-                                        equipo?.descripcionAccesorios ?? 'N/A',
-                                        style: TextStyle(fontSize: 16, color: Colors.black),
-                                        overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                        softWrap: true, // Allow text to wrap
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: 10),
-                                    Text(
-                                      "Is In Garantia: ",
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                      softWrap: true, // Allow text to wrap
-                                    ),
-                                    SizedBox(width: 10),
-                                    Flexible(
-                                      child: Text(
-                                        equipo?.garantia == 1 ? "SI" : "NO", // This can be dynamic and longer if needed
+                                        equipo?.garantia == 1 ? "SI" : "NO",
                                         style: TextStyle(fontSize: 16, color: Colors.black),
                                         overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
                                         softWrap: true, // Allow text to wrap
@@ -416,7 +398,7 @@ class resguardoDeDeposito extends StatelessWidget{
                 MaterialPageRoute(
                   builder: (context) {
                     customersController.customer = null;
-                    return customerView();
+                    return CustomerView();
                   },
                 ),
               );
@@ -772,7 +754,7 @@ class resguardoDeDeposito extends StatelessWidget{
                       MaterialPageRoute(
                         builder: (context) {
                           // You can pass the selected customer to the AddEquipo screen if needed
-                          return resguardoDeDeposito();
+                          return ResguardoDeDeposito();
                         },
                       ),
                     );

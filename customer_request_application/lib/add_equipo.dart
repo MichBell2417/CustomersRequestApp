@@ -21,8 +21,9 @@ final descriptionAccessoriosController = TextEditingController();
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { si, no }
 
-// ignore: must_be_immutable, camel_case_types, use_key_in_widget_constructors
-class AddEquipo extends StatelessWidget {  
+// ignore: must_be_immutable
+class AddEquipo extends StatelessWidget {
+  AddEquipo({super.key});
   ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
   
   final SignatureController controllerSAT = SignatureController(
@@ -96,7 +97,7 @@ class AddEquipo extends StatelessWidget {
                 context, 
                 MaterialPageRoute(
                   builder: (context) {
-                    return resguardoDeDeposito();
+                    return ResguardoDeDeposito();
                   },
                 ),
               );
@@ -534,54 +535,95 @@ class AddEquipo extends StatelessWidget {
               
               SizedBox(height: 16),
 
-              Container(
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 2,
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    if(controllerCustomers.isNotEmpty && controllerSAT.isNotEmpty){
-                      customersController.addDevice(tipoController.text, marcaController.text, modeloController.text, numeroSerieController.text, descriptionController.text, descriptionAccessoriosController.text);
-                      customersController.alert(context,  "Saved", "The EQUIPO has been saved in the database.");
-                      
-                      Navigator.pop(context);
-                    }else{
-                      customersController.alert(
-                        context,
-                        "Error",
-                        "You need to sign."
-                      );
-                    }
-                  },
-                  icon: Icon(
-                    Icons.save,
-                    color: Colors.black,
-                    size: 28,
-                  ),
-                  label: Text(
-                    'Save equipo',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: Colors.grey,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.transparent,
-                    elevation: 0,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if(controllerCustomers.isNotEmpty && controllerSAT.isNotEmpty){
+                          customersController.addDevice(tipoController.text, marcaController.text, modeloController.text, numeroSerieController.text, descriptionController.text, descriptionAccessoriosController.text);
+                          customersController.alert(context,  "Saved", "The EQUIPO has been saved in the database.");
+                          
+                          Navigator.pop(context);
+                        }else{
+                          customersController.alert(
+                            context,
+                            "Error",
+                            "You need to sign."
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        Icons.save,
+                        color: Colors.black,
+                        size: 28,
+                      ),
+                      label: Text(
+                        'Save equipo',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.transparent,
+                        elevation: 0,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        print("TODO ON PRESSED!!!");
+                      },
+                      icon: Icon(
+                        Icons.upgrade,
+                        color: Colors.black,
+                        size: 28,
+                      ),
+                      label: Text(
+                        'Upgrade equipo',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.transparent,
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

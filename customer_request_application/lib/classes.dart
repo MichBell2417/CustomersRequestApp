@@ -481,7 +481,14 @@ class ApplicationController extends ChangeNotifier {
     
   }
 
-
+  Future<bool> deleteDevice(int id) async{
+    try{
+      database!.query("DELETE FROM equipos WHERE id = '$id'");
+      return true;
+    }catch (e){
+      return false;
+    }
+  }
 
 //--------------------------------------------------------- Methods for the searching query
   Future<bool> findCustomerFromNumberdb(int index) async {
