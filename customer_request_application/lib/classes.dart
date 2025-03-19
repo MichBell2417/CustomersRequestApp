@@ -484,11 +484,42 @@ class ApplicationController extends ChangeNotifier {
   Future<bool> deleteDevice(int id) async{
     try{
       database!.query("DELETE FROM equipos WHERE id = '$id'");
+      
+      equipos.removeWhere((equipo) => equipo.id == id);
+      notifyListeners();
       return true;
     }catch (e){
       return false;
     }
+
   }
+
+  Future<bool> upgradeDevice(String tipo, String marca, String modelo, String numeroSerie, String descripcion, String descripcionAccesorios) async {
+    try {
+      // Make the query asynchronous
+      await database!.query(
+        "UPDATE equipos SET tipo = '$tipo', marca='$marca', modelo='$modelo', numeroSerie='$numeroSerie', descripcionAccesorios='$descripcionAccesorios', descripcion='$descripcion' WHERE id = ${equipo!.id}; ",
+      );
+
+      // Update the local equipo object with the new values
+      equipo!.setTipo(tipo);
+      equipo!.setMarca(marca);
+      equipo!.setModello(modelo);
+      equipo!.setNumeroDiSerie(numeroSerie);
+      equipo!.setDescripcionAccesorios(descripcionAccesorios);
+      equipo!.setDescripcion(descripcion);
+
+      // Notify listeners to update the UI
+      notifyListeners();
+
+      return true; // Success
+    } catch (e) {
+      // In case of an error, show an alert and return false
+      alert(classContext!, "Error", "Error while trying to upgrade.");
+      return false; // Error
+    }
+  }
+
 
 //--------------------------------------------------------- Methods for the searching query
   Future<bool> findCustomerFromNumberdb(int index) async {

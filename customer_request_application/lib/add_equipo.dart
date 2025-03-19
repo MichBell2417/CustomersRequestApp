@@ -584,44 +584,7 @@ class AddEquipo extends StatelessWidget {
                         elevation: 0,
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: Colors.grey,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        print("TODO ON PRESSED!!!");
-                      },
-                      icon: Icon(
-                        Icons.upgrade,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      label: Text(
-                        'Upgrade equipo',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.transparent,
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
+                  )
                 ],
               )
             ],
