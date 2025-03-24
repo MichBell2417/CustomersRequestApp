@@ -123,201 +123,163 @@ class DetailEquipo extends StatelessWidget {
                                 color: Colors.blueGrey,  // Change the title color
                               ),
                             ),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Row with Label and TextField side by side
-                                //TIPO
-                                Row(
-                                  children: [
-                                    // Label for the 'Tipo' field
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10.0), // Add space between label and TextField
-                                      child: Text(
-                                        'Tipo:', // Label text
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text field for the 'Tipo'
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: tipoController,
-                                        maxLines: null,
-                                        minLines: 1,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                            content: SingleChildScrollView(  // Add SingleChildScrollView here
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // TIPO
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 10.0),
+                                        child: Text(
+                                          'Tipo:',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: tipoController,
+                                          maxLines: null,
+                                          minLines: 1,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                            ),
+                                            hintText: 'Enter Tipo...',
+                                            hintStyle: TextStyle(color: Colors.grey),
                                           ),
-                                          hintText: 'Enter Tipo...',
-                                          hintStyle: TextStyle(color: Colors.grey),  // Hint text style
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16),
 
-                                SizedBox(height: 16),
-                                
-                                //MARCA
-                                Row(
-                                  children: [
-                                    // Label for the 'Marca' field
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10.0), // Add space between label and TextField
-                                      child: Text(
-                                        'Marca:', // Label text
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text field for the 'Marca'
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: marcaController,
-                                        maxLines: null,
-                                        minLines: 1,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                  // MARCA
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 10.0),
+                                        child: Text(
+                                          'Marca:',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: marcaController,
+                                          maxLines: null,
+                                          minLines: 1,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                            ),
+                                            hintText: 'Enter Marca...',
+                                            hintStyle: TextStyle(color: Colors.grey),
                                           ),
-                                          hintText: 'Enter marca...',
-                                          hintStyle: TextStyle(color: Colors.grey),  // Hint text style
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16),
 
-                                SizedBox(height: 16),
-                                
-                                //MODELO
-                                Row(
-                                  children: [
-                                    // Label for the 'Modelo' field
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10.0), // Add space between label and TextField
-                                      child: Text(
-                                        'Modelo:', // Label text
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text field for the 'Modelo'
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: modeloController,
-                                        maxLines: null,
-                                        minLines: 1,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                  // MODELO
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 10.0),
+                                        child: Text(
+                                          'Modelo:',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: modeloController,
+                                          maxLines: null,
+                                          minLines: 1,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                            ),
+                                            hintText: 'Enter Modelo...',
+                                            hintStyle: TextStyle(color: Colors.grey),
                                           ),
-                                          hintText: 'Enter modelo...',
-                                          hintStyle: TextStyle(color: Colors.grey),  // Hint text style
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16),
 
-                                SizedBox(height: 16),
-                                
-                                //NUMERO DE SERIE
-                                Row(
-                                  children: [
-                                    // Label for the 'NumeroSerie' field
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10.0), // Add space between label and TextField
-                                      child: Text(
-                                        'Numero de serie:', // Label text
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text field for the 'NumeroSerie'
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: numeroSerieController,
-                                        maxLines: null,
-                                        minLines: 1,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                  // NUMERO DE SERIE
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 10.0),
+                                        child: Text(
+                                          'Numero de serie:',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: numeroSerieController,
+                                          maxLines: null,
+                                          minLines: 1,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: BorderSide(color: Colors.black, width: 1.0),
+                                            ),
+                                            hintText: 'Enter Numero de Serie...',
+                                            hintStyle: TextStyle(color: Colors.grey),
                                           ),
-                                          hintText: 'Enter Numero De Serie...',
-                                          hintStyle: TextStyle(color: Colors.grey),  // Hint text style
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-
-                                //GARANTIA
-                                Row(
-                                  children: [
-                                    // Label for the 'Garantia' field
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 10.0), // Add space between label and TextField
-                                      child: Text(
-                                        'Garantia:', // Label text
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text field for the 'Garantia'
-                                    Expanded(
-                                      child: Text("data"),
-                                    ),
-                                  ],
-                                ),
-
-
-
-
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-
-
                             actions: <Widget>[
                               TextButton(
                                 style: TextButton.styleFrom(
@@ -337,13 +299,14 @@ class DetailEquipo extends StatelessWidget {
                                     customersController.equipo!.descripcionAccesorios,
                                   );
                                   if (success) {
+                                    customersController.equipos.clear();
                                     // Show confirmation alert
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
                                           title: Text(
-                                            "Update Successful",
+                                            "Update",
                                             style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -367,7 +330,7 @@ class DetailEquipo extends StatelessWidget {
                                               onPressed: () {
                                                 Navigator.of(context).pop();  // Close the confirmation dialog
                                                 Navigator.pop(context);  // Close the update dialog
-                                                Navigator.pushReplacement(
+                                                Navigator.push(
                                                   context,
                                                   MaterialPageRoute(builder: (context) => DetailEquipo()),
                                                 );
@@ -399,6 +362,7 @@ class DetailEquipo extends StatelessWidget {
                           );
                         },
                       );
+
                     }, // Open dialog when card is tapped
                     child: Card(
                       elevation: 4,
@@ -513,7 +477,7 @@ class DetailEquipo extends StatelessWidget {
                               ),
                               SizedBox(height: 16),
 
-                              // Last row - Accesorios
+                              // Last row - Garantia
                               Row(
                                 children: [
                                   Expanded(
@@ -870,22 +834,54 @@ class DetailEquipo extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       // Attempt to delete the device
-                      if (await customersController.deleteDevice(customersController.equipo!.id)) {
+                      if (await customersController.deleteDevice(customersController.equipo!.id)) {              
                         // Show confirmation alert
-                        customersController.alert(context, "Done!", "The device has been deleted correctly.");
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                "Delete",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,  // Green color for success
+                                ),
+                              ),
+                              content: Text(
+                                "The device have been successfully deleted.",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    "OK",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onPressed: () { 
+                                    Navigator.of(context).pop();  // Close the dialog first
 
-                        // Wait for the alert to be closed before navigating
-                        await Future.delayed(Duration(seconds: 2));  // Optional delay before going back
-
-                        customersController.equipos.clear();
-
-                        // Navigate to ResguardoDeDeposito page after deletion
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => ResguardoDeDeposito()),
+                                    // Now navigate to ResguardoDeDeposito
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return ResguardoDeDeposito();
+                                        },
+                                      )
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         );
-                      } else {
-                        // Show error alert if the deletion fails
+                      }else{
+                        // Show error alert if it fails
                         customersController.alert(context, "Error", "There has been a mistake in deleting this device :(");
                       }
                     },

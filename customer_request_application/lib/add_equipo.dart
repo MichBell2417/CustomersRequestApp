@@ -1,9 +1,25 @@
-import 'package:customer_request_application/resguardo_de_deposito.dart';
-import 'package:flutter/material.dart';
-import 'package:customer_request_application/interfaces.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+
+///LINKTO THE OTHER PAGES
+import 'package:customer_request_application/resguardo_de_deposito.dart';
+import 'package:customer_request_application/interfaces.dart';
 import 'package:customer_request_application/classes.dart';
+
+///SIGNATURE LIBRARY 
 import 'package:signature/signature.dart';
+
+///PDF LIBRARY
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:open_file/open_file.dart';
+
+///SIGNATURE TO IMAGE LIBRARY
+import 'dart:typed_data';
+import 'package:image/image.dart' as img; // For image manipulation
+import 'dart:ui' as ui;  // Import dart:ui to work with images
+
 
 ///Global variable and methods
 late ApplicationController customersController;
@@ -16,7 +32,6 @@ final marcaController = TextEditingController();
 final modeloController = TextEditingController();
 final numeroSerieController = TextEditingController();
 final descriptionAccessoriosController = TextEditingController();
-
 
 ///-------------------------------- class with the interface to manage the hours
 enum SingingCharacter { si, no }
@@ -37,6 +52,95 @@ class AddEquipo extends StatelessWidget {
     penColor: Colors.black,
     exportBackgroundColor: Colors.transparent,
   );
+
+  //Exporting the signature as png or jpeg (to put them in a pdf file?)
+  Future<void> _exportSignatureAsImage() async {
+    try {
+      // Get the signature image as a PNG
+      final signature = await controllerSAT.toImage();
+      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
+
+      // Get the device's directory to save the file
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/signature.png';
+
+      // Save the image as PNG
+      final file = File(filePath);
+      await file.writeAsBytes(bytes as List<int>);
+
+      print("Signature saved as PNG at: $filePath");
+    } catch (e) {
+      print("Error saving signature: $e");
+    }
+  }
+
+  Future<void> _exportSignatureAsJPEG() async {
+    try {
+      // Get the signature image as PNG
+      final signature = await controllerSAT.toImage();
+      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
+
+      // Decode the PNG image into a usable format
+      img.Image? decodedImage = img.decodeImage(Uint8List.fromList(bytes as List<int>));
+
+      if (decodedImage != null) {
+        // Convert the image to JPEG
+        final jpegBytes = img.encodeJpg(decodedImage, quality: 85);
+
+        // Get the device's directory to save the JPEG
+        final directory = await getApplicationDocumentsDirectory();
+        final filePath = '${directory.path}/signature.jpg';
+        final file = File(filePath);
+
+        // Save the JPEG image
+        await file.writeAsBytes(jpegBytes);
+
+        print("Signature saved as JPEG at: $filePath");
+      }
+    } catch (e) {
+      print("Error saving signature as JPEG: $e");
+    }
+  }
+
+  Future<void> _generateAndSavePdf(BuildContext context) async {
+    final pdf = pw.Document();
+
+    // Aggiungere una pagina con i dati del cliente
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            children: [
+              pw.Text('Dati del Cliente', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 20),
+              pw.Text('Nome: ${customersController.customer!.name}'),
+              pw.Text('Email: ${customersController.customer!.eMail}'),
+              pw.Text('Telefono: ${customersController.customer!.phoneNumber}'),
+            ],
+          );
+        },
+      ),
+    );
+    _exportSignatureAsJPEG();
+    _exportSignatureAsImage();
+
+    // Ottieni il percorso dove salvare il file PDF
+    final output = await getExternalStorageDirectory();
+    final filePath = '${output!.path}/cliente_dati.pdf';
+    final file = File(filePath);
+
+    // Salva il PDF sul file system
+    await file.writeAsBytes(await pdf.save());
+
+    // Mostra un messaggio di successo
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF salvato in $filePath')));
+
+    // Apri il PDF appena creato (opzionale)
+    OpenFile.open(filePath);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +212,7 @@ class AddEquipo extends StatelessWidget {
 
       body: Padding(
         padding: EdgeInsets.all(8.0),
-        child: SingleChildScrollView( // Aggiungi SingleChildScrollView per evitare overflow
+        child: SingleChildScrollView( // Add SingleChildScrollView to avoid overflow
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -424,6 +528,7 @@ class AddEquipo extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
+
               Card(
                 elevation: 6,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -534,57 +639,117 @@ class AddEquipo extends StatelessWidget {
               ),
               
               SizedBox(height: 16),
-
+              
               Row(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: Colors.grey,
+                  Expanded(  // This makes the button take all available width
+                    child: Container(
+                      padding: EdgeInsets.all(8), // Adjust the padding to prevent overflow
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 2,
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(12),  // Keeps rounded corners
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        if(controllerCustomers.isNotEmpty && controllerSAT.isNotEmpty){
-                          customersController.addDevice(tipoController.text, marcaController.text, modeloController.text, numeroSerieController.text, descriptionController.text, descriptionAccessoriosController.text);
-                          customersController.alert(context,  "Saved", "The EQUIPO has been saved in the database.");
-                          
-                          Navigator.pop(context);
-                        }else{
-                          customersController.alert(
-                            context,
-                            "Error",
-                            "You need to sign."
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        Icons.save,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      label: Text(
-                        'Save equipo',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          var success = controllerCustomers.isNotEmpty && controllerSAT.isNotEmpty;
+                          // Check if both signature controllers have content
+                          if (success) {
+                            customersController.addDevice(
+                              tipoController.text,
+                              marcaController.text,
+                              modeloController.text,
+                              numeroSerieController.text,
+                              descriptionController.text,
+                              descriptionAccessoriosController.text,
+                            );
+                            
+                            // Show confirmation alert
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    "Equipos Added",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,  // Green color for success
+                                    ),
+                                  ),
+                                  content: Text(
+                                    "The device has been successfully added.",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text(
+                                        "OK",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.blueAccent,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () {
+
+                                        _generateAndSavePdf(context);
+                                         
+                                        Navigator.of(context).pop();  // Close the dialog first
+
+                                        // Now navigate to ResguardoDeDeposito
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return ResguardoDeDeposito();
+                                            },
+                                          )
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                          } else {
+                            // Show an error dialog if signatures are not provided
+                            customersController.alert(
+                              context,
+                              "Error",
+                              "You need to sign."
+                            );
+                          }
+                        },
+
+                        icon: Icon(
+                          Icons.save,
                           color: Colors.black,
+                          size: 28,
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        label: Text(
+                          'Save equipo',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.transparent,
-                        elevation: 0,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50), // Button will expand to fill the available width
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.transparent,
+                          elevation: 0,
+                        ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               )
             ],

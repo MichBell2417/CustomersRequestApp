@@ -398,40 +398,38 @@ class ApplicationController extends ChangeNotifier {
 ///--------------------------------QUERY DEVICES
   //Takes all the devices from the database
   Future<List<Equipo?>?> pullDevicesOfCustomer(int index) async {
-    equipos.clear();
-    // Simulate a delay (e.g., network request or database query)
     await Future.delayed(Duration(seconds: 5)); // Simulate a delay
 
     Results equiposdb;
 
     try {
-      // Query the database for devices (replace with your actual query)
+      equipos.clear();
       equiposdb = await database!.query("SELECT * FROM equipos WHERE id_cliente='$index'");
       if (equiposdb.isEmpty) {
-        return null;  // No devices found
+        return null;
+      }else{
+        for (var equiposLocal in equiposdb) {
+          equipos.add(
+            Equipo(
+              equiposLocal['id'],
+              equiposLocal['tipo'],
+              equiposLocal['marca'],
+              equiposLocal['modelo'],
+              equiposLocal['numeroSerie'],
+              equiposLocal['garantia'],
+              equiposLocal['descripcionAccesorios'],
+              equiposLocal['descripcion'],
+              equiposLocal['id_cliente'],
+            )
+          );
+        }
       }
+      return equipos; 
     } catch (e) {
-      return null;  // Return null in case of an error
+      return null;
     }
-    
-    for (var equiposLocal in equiposdb) {
-      equipos.add(
-        Equipo(
-          equiposLocal['id'],
-          equiposLocal['tipo'],
-          equiposLocal['marca'],
-          equiposLocal['modelo'],
-          equiposLocal['numeroSerie'],
-          equiposLocal['garantia'],
-          equiposLocal['descripcionAccesorios'],
-          equiposLocal['descripcion'],
-          equiposLocal['id_cliente'],
-        )
-      );
-    }
-    
-    return equipos;  // Return the Equipo object
   }
+
 
   //Adds a device to the database
   Future<bool> addDevice(String tipo, String marca, String modelo, String numeroSerie, String descripcion, String descripcionAccesorios,) async {
@@ -441,37 +439,10 @@ class ApplicationController extends ChangeNotifier {
         "INSERT INTO equipos (tipo, marca, modelo, numeroSerie, garantia, descripcionAccesorios, descripcion, id_cliente) "
         "VALUES ('$tipo', '$marca', '$modelo', '$numeroSerie', '$isInGarantia', '$descripcionAccesorios', '$descripcion', '${customer!.id}');"
       );
+      
+      notifyListeners();
+      return true;
 
-      // Retrieve the ID of the newly inserted equipo
-      var result = await database!.query(
-        "SELECT id FROM equipos WHERE tipo = '$tipo' AND marca = '$marca' AND modelo = '$modelo' AND id_cliente = '${customer!.id}';"
-      );
-
-      // Ensure that the query returns at least one row before accessing the value
-      if (result.isNotEmpty) {
-        int id = result.first['id'];  // Extract the 'id' from the first row in the result
-        equipos.add(
-          Equipo(
-            id, // Passing the full result for Equipo constructor (optional)
-            tipo,
-            marca,
-            modelo,
-            numeroSerie,
-            isInGarantia,
-            descripcionAccesorios,
-            descripcion,
-            customer!.id,
-          ),
-        );
-
-        pullCustomers();
-        notifyListeners();
-        
-        return true;
-      }else{
-        alert(classContext!, "Not found", "No EQUIPO found in the database with the specified criteria.");
-        return false;
-      }
     } catch (e) {
       // Show error message in case of failure
       alert(classContext!, "Not saved", "The EQUIPO hasn't been saved in the database. Check if you inserted the information correctly.");
@@ -485,7 +456,6 @@ class ApplicationController extends ChangeNotifier {
     try{
       database!.query("DELETE FROM equipos WHERE id = '$id'");
       
-      equipos.removeWhere((equipo) => equipo.id == id);
       notifyListeners();
       return true;
     }catch (e){

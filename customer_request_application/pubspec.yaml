@@ -16,8 +16,10 @@ dependencies:
   sqflite: ^2.4.1
   mysql1: ^0.20.0
   signature: ^5.5.0
-  path_provider: ^2.1.5
   image: ^4.5.3
+  pdf: ^3.6.0 # Per generare PDF
+  path_provider: ^2.0.8 # Per salvare il PDF nel file system
+  open_file: ^3.2.1 # Per aprire il PDF (opzionale)
 
 dev_dependencies:
   flutter_test:

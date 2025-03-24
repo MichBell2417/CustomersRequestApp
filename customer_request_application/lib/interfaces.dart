@@ -312,6 +312,7 @@ class Menu extends StatelessWidget{
                 height: 75,
                 child: ElevatedButton(
                   onPressed: (){
+                    customersController.equipo = null;
                     Navigator.push(context, MaterialPageRoute(builder: (context){
                       return ResguardoDeDeposito();
                     }));

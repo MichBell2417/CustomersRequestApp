@@ -115,6 +115,7 @@ class ResguardoDeDeposito extends StatelessWidget{
             color: Colors.black,
           ),
         ),
+
         SizedBox(height: 16),
 
         // Iterate through the list of equipos and generate a Card for each
@@ -124,8 +125,6 @@ class ResguardoDeDeposito extends StatelessWidget{
               padding: const EdgeInsets.only(bottom: 16), // Padding between each equipment card
               child: GestureDetector(
                 onTap: () {
-                  /*print(equipos.length);
-                  print("Tapped on equipo with tipo: ${equipo?.numeroSerie}");*/
                   customersController.equipo = equipo;
                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailEquipo()));
                 },
@@ -305,7 +304,6 @@ class ResguardoDeDeposito extends StatelessWidget{
                 context, 
                 MaterialPageRoute(
                   builder: (context) {
-                    //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
                     return AddEquipo();
                   },
                 ),
@@ -640,6 +638,7 @@ class ResguardoDeDeposito extends StatelessWidget{
 
               ),
             ),
+
             FutureBuilder<List<Equipo?>?>(
               future: customersController.pullDevicesOfCustomer(customersController.customer!.id),
               builder: (context, snapshot) {
@@ -662,27 +661,7 @@ class ResguardoDeDeposito extends StatelessWidget{
                 } else if (snapshot.connectionState == ConnectionState.done) {
                   // If the future is done, check if we have data
                   if (snapshot.hasData) {
-                    final equipo = snapshot.data;
-                    // If we have a valid Equipo, show its content
-                    if(equipo != null){
-                      return _buildSuccessContent(equipo,context);  // You need to pass the Equipos to this function
-                    }else{
-                      return Center(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context, 
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  //customersController.setCustomer(Customer(_id, _name, _eMail, _phoneNumber, _street, _remainingContractTime, _contractType, _dni, _cp));
-                                  return AddEquipo();
-                                },
-                              ),
-                            );
-                          },label: Icon(Icons.add),
-                        )
-                      );
-                    }
+                    return _buildSuccessContent(customersController.equipos,context);  // You need to pass the Equipos to this function
                   } else {
                     // If no data is found (snapshot.data is null)
                     return _buildNoDevicesContent(context);
