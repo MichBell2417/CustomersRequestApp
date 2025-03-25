@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'package:signature/signature.dart';
 ///PDF LIBRARY
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:open_file/open_file.dart';
+//import 'package:open_file/open_file.dart';
 
 ///SIGNATURE TO IMAGE LIBRARY
 import 'dart:typed_data';
@@ -54,7 +56,7 @@ class AddEquipo extends StatelessWidget {
   );
 
   //Exporting the signature as png or jpeg (to put them in a pdf file?)
-  Future<void> _exportSignatureAsImage() async {
+  /*Future<void> _exportSignatureAsPNG() async {
     try {
       // Get the signature image as a PNG
       final signature = await controllerSAT.toImage();
@@ -62,18 +64,34 @@ class AddEquipo extends StatelessWidget {
       final bytes = byteData?.buffer.asUint8List();
 
       // Get the device's directory to save the file
-      final directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/signature.png';
+      final directory = await getExternalStorageDirectory();
+      final filePath = '${directory?.path}/signature.png';
 
       // Save the image as PNG
       final file = File(filePath);
       await file.writeAsBytes(bytes as List<int>);
-
-      print("Signature saved as PNG at: $filePath");
     } catch (e) {
       print("Error saving signature: $e");
     }
-  }
+
+    try {
+      // Get the signature image as a PNG
+      final signature = await controllerCustomers.toImage();
+      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
+
+      // Get the device's directory to save the file
+      final directory = await getExternalStorageDirectory();
+      final filePath = '${directory?.path}/signature.png';
+
+      // Save the image as PNG
+      final file = File(filePath);
+      await file.writeAsBytes(bytes as List<int>);
+    
+    } catch (e) {
+      print("Error saving signature: $e");
+    }
+  }*/
 
   Future<void> _exportSignatureAsJPEG() async {
     try {
@@ -90,14 +108,37 @@ class AddEquipo extends StatelessWidget {
         final jpegBytes = img.encodeJpg(decodedImage, quality: 85);
 
         // Get the device's directory to save the JPEG
-        final directory = await getApplicationDocumentsDirectory();
-        final filePath = '${directory.path}/signature.jpg';
+        final directory = await getExternalStorageDirectory();
+        final filePath = '${directory?.path}/signatureSAT.jpg';
         final file = File(filePath);
 
         // Save the JPEG image
         await file.writeAsBytes(jpegBytes);
+      }
+    } catch (e) {
+      print("Error saving signature as JPEG: $e");
+    }
 
-        print("Signature saved as JPEG at: $filePath");
+    try {
+      // Get the signature image as PNG
+      final signature = await controllerCustomers.toImage();
+      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
+
+      // Decode the PNG image into a usable format
+      img.Image? decodedImage = img.decodeImage(Uint8List.fromList(bytes as List<int>));
+
+      if (decodedImage != null) {
+        // Convert the image to JPEG
+        final jpegBytes = img.encodeJpg(decodedImage, quality: 85);
+
+        // Get the device's directory to save the JPEG
+        final directory = await getExternalStorageDirectory();
+        final filePath = '${directory?.path}/signatureCustomer.jpg';
+        final file = File(filePath);
+
+        // Save the JPEG image
+        await file.writeAsBytes(jpegBytes);
       }
     } catch (e) {
       print("Error saving signature as JPEG: $e");
@@ -123,12 +164,19 @@ class AddEquipo extends StatelessWidget {
         },
       ),
     );
-    _exportSignatureAsJPEG();
-    _exportSignatureAsImage();
 
-    // Ottieni il percorso dove salvare il file PDF
-    final output = await getExternalStorageDirectory();
-    final filePath = '${output!.path}/cliente_dati.pdf';
+    // Ottieni la directory di archiviazione esterna
+    final directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      // Se non si riesce a ottenere la directory, mostra un messaggio di errore
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Impossibile accedere alla directory esterna!')));
+      return;
+    }
+
+    //_exportSignatureAsPNG();
+    _exportSignatureAsJPEG();
+
+    final filePath = '${directory.path}/cliente_dati.pdf';
     final file = File(filePath);
 
     // Salva il PDF sul file system
@@ -137,9 +185,25 @@ class AddEquipo extends StatelessWidget {
     // Mostra un messaggio di successo
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF salvato in $filePath')));
 
-    // Apri il PDF appena creato (opzionale)
-    OpenFile.open(filePath);
+    // Apri il PDF appena creato
+    //OpenFile.open(filePath);
+
+    // Aspetta 2 secondi prima di chiudere la pagina e navigare a ResguardoDeDeposito
+    Future.delayed(Duration(seconds: 2), () {
+      // Chiudi la pagina corrente (la finestra del dialogo)
+      Navigator.of(context).pop();
+
+      // Ora naviga alla nuova schermata
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResguardoDeDeposito(),
+        ),
+      );
+    });
   }
+
+
 
 
   @override
@@ -696,8 +760,10 @@ class AddEquipo extends StatelessWidget {
                                       onPressed: () {
 
                                         _generateAndSavePdf(context);
+
+                                        
                                          
-                                        Navigator.of(context).pop();  // Close the dialog first
+                                        /*Navigator.of(context).pop();  // Close the dialog first
 
                                         // Now navigate to ResguardoDeDeposito
                                         Navigator.pushReplacement(
@@ -707,7 +773,7 @@ class AddEquipo extends StatelessWidget {
                                               return ResguardoDeDeposito();
                                             },
                                           )
-                                        );
+                                        );*/
                                       },
                                     ),
                                   ],
