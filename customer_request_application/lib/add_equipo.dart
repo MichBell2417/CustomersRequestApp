@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +12,9 @@ import 'package:customer_request_application/classes.dart';
 import 'package:signature/signature.dart';
 
 ///PDF LIBRARY
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
-//import 'package:open_file/open_file.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 ///SIGNATURE TO IMAGE LIBRARY
 import 'dart:typed_data';
@@ -93,7 +92,7 @@ class AddEquipo extends StatelessWidget {
     }
   }*/
 
-  Future<void> _exportSignatureAsJPEG() async {
+  /*Future<void> _exportSignatureAsJPEG() async {
     try {
       // Get the signature image as PNG
       final signature = await controllerSAT.toImage();
@@ -143,67 +142,70 @@ class AddEquipo extends StatelessWidget {
     } catch (e) {
       print("Error saving signature as JPEG: $e");
     }
-  }
+  }*/
 
-  Future<void> _generateAndSavePdf(BuildContext context) async {
-    final pdf = pw.Document();
+  Future<void> modifyPdfDirectly(BuildContext context) async {
+    try {
+      // Carica il file PDF esistente
+      final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
+      final Uint8List pdfData = bytes.buffer.asUint8List();
 
-    // Aggiungere una pagina con i dati del cliente
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              pw.Text('Dati del Cliente', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 20),
-              pw.Text('Nome: ${customersController.customer!.name}'),
-              pw.Text('Email: ${customersController.customer!.eMail}'),
-              pw.Text('Telefono: ${customersController.customer!.phoneNumber}'),
-            ],
-          );
-        },
-      ),
-    );
+      // Apri il documento PDF
+      final PdfDocument document = PdfDocument(inputBytes: pdfData);
 
-    // Ottieni la directory di archiviazione esterna
-    final directory = await getExternalStorageDirectory();
-    if (directory == null) {
-      // Se non si riesce a ottenere la directory, mostra un messaggio di errore
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Impossibile accedere alla directory esterna!')));
-      return;
+      // Accedi alla prima pagina (o altre pagine se necessario)
+      final PdfPage page = document.pages[0];
+      final PdfGraphics graphics = page.graphics;
+
+      // Aggiungi testo dinamico accanto al campo "NOMBRE"
+      final PdfFont font = PdfStandardFont(PdfFontFamily.helvetica, 14);
+      graphics.drawString(
+        '${customersController.customer!.name}', // Testo dinamico
+        font,
+        bounds: const Rect.fromLTWH(200, 150, 300, 20), // Posizionamento del testo (coordina qui manualmente)
+      );
+
+      // Salva il documento modificato
+      final directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
+        );
+        return;
+      }
+
+      final String filePath = '${directory.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.pdf';
+      final File file = File(filePath);
+      await file.writeAsBytes(document.saveSync());
+
+      // Chiudi il documento per rilasciare risorse
+      document.dispose();
+
+      // Mostra un messaggio di successo
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF modificato e salvato in $filePath')),
+      );
+    } catch (e) {
+      // Gestione degli errori
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
+      );
     }
 
-    //_exportSignatureAsPNG();
-    _exportSignatureAsJPEG();
-
-    final filePath = '${directory.path}/cliente_dati.pdf';
-    final file = File(filePath);
-
-    // Salva il PDF sul file system
-    await file.writeAsBytes(await pdf.save());
-
-    // Mostra un messaggio di successo
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF salvato in $filePath')));
-
-    // Apri il PDF appena creato
-    //OpenFile.open(filePath);
-
-    // Aspetta 2 secondi prima di chiudere la pagina e navigare a ResguardoDeDeposito
-    Future.delayed(Duration(seconds: 2), () {
-      // Chiudi la pagina corrente (la finestra del dialogo)
-      Navigator.of(context).pop();
-
-      // Ora naviga alla nuova schermata
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResguardoDeDeposito(),
-        ),
-      );
-    });
+    ///parte finale non relativa ai file
+    Future.delayed(
+      Duration(seconds: 2), () {      
+        Navigator.of(context).pop();
+        
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResguardoDeDeposito(),
+          ),
+        );
+      }
+    );
   }
-
-
 
 
   @override
@@ -256,7 +258,7 @@ class AddEquipo extends StatelessWidget {
             ),
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg"),
+        leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg"),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.arrow_back_ios,size: 20),
@@ -758,11 +760,8 @@ class AddEquipo extends StatelessWidget {
                                         ),
                                       ),
                                       onPressed: () {
+                                        modifyPdfDirectly(context);
 
-                                        _generateAndSavePdf(context);
-
-                                        
-                                         
                                         /*Navigator.of(context).pop();  // Close the dialog first
 
                                         // Now navigate to ResguardoDeDeposito

@@ -18,8 +18,9 @@ dependencies:
   signature: ^5.5.0
   image: ^4.5.3
   pdf: ^3.6.0 # Per generare PDF
+  pdf_render: ^1.4.12
   path_provider: ^2.0.8 # Per salvare il PDF nel file system
-  open_file: ^3.2.1 # Per aprire il PDF (opzionale)
+  syncfusion_flutter_pdf: ^20.1.59
 
 dev_dependencies:
   flutter_test:
@@ -29,4 +30,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-  - resources/image/
+  - assets/resources/image/
+  - assets/resources/Documents/ResguardoDeposito.pdf

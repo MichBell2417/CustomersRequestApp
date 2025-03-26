@@ -5,8 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:customer_request_application/interfaces.dart';
 import 'package:customer_request_application/classes.dart';
 
+
+///PDF LIBRARY
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'dart:typed_data';
+import 'dart:io';
+
+
 ///Global variable and methods
 late ApplicationController customersController;
+
 final tipoController = TextEditingController();
 final marcaController = TextEditingController();
 final modeloController = TextEditingController();
@@ -16,6 +26,61 @@ final descriptionAccessoriosController = TextEditingController();
 
 class DetailEquipo extends StatelessWidget {
   const DetailEquipo({super.key});
+
+  /*Future<void> modifyPdfWithCustomFormatting(BuildContext context) async {
+    try {
+      // Carica il file PDF esistente
+      final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
+      final Uint8List pdfData = bytes.buffer.asUint8List();
+
+      // Apri il documento PDF
+      final PdfDocument document = PdfDocument(inputBytes: pdfData);
+
+      // Accedi alla prima pagina (o altre pagine se necessario)
+      final PdfPage page = document.pages[0];
+      final PdfGraphics graphics = page.graphics;
+
+      // Definisci un font simile a quello originale del PDF
+      final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Cambia con il font desiderato
+
+      // Imposta il colore e lo stile del testo (esempio: nero opaco)
+      final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Colore nero
+
+      // Scrivi il testo dinamico accanto al campo "NOMBRE"
+      graphics.drawString(
+        '${customersController.customer!.name}', // Testo dinamico
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(100, 50, 300, 20), // Posizionamento
+      );
+
+      // Salva il documento modificato
+      final directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
+        );
+        return;
+      }
+
+      final String filePath = '${directory.path}/modified_ResguardoDeposito.pdf';
+      final File file = File(filePath);
+      await file.writeAsBytes(document.saveSync());
+
+      // Chiudi il documento per rilasciare risorse
+      document.dispose();
+
+      // Mostra un messaggio di successo
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF modificato e salvato in $filePath')),
+      );
+    } catch (e) {
+      // Gestione degli errori
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
+      );
+    }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +135,7 @@ class DetailEquipo extends StatelessWidget {
             ),
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg"),
+        leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg"),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
@@ -829,6 +894,7 @@ class DetailEquipo extends StatelessWidget {
           Row(
             children: [
               Expanded(
+                flex: 3,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Add horizontal padding to distance from the sides
                   child: ElevatedButton.icon(
@@ -906,6 +972,95 @@ class DetailEquipo extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12), // Rounded corners for a smooth look
                         side: BorderSide(color: Color(0xFFB71C1C), width: 2), // Dark red border around the button
+                      ),
+                      elevation: 5, // Light shadow for the button
+                      shadowColor: Colors.black45, // Shadow color for better visibility
+                      splashFactory: InkSplash.splashFactory, // Splash effect when clicked
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Add horizontal padding to distance from the sides
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                        try {
+                        // Carica il file PDF esistente
+                        final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
+                        final Uint8List pdfData = bytes.buffer.asUint8List();
+
+                        // Apri il documento PDF
+                        final PdfDocument document = PdfDocument(inputBytes: pdfData);
+
+                        // Accedi alla prima pagina (o altre pagine se necessario)
+                        final PdfPage page = document.pages[0];
+                        final PdfGraphics graphics = page.graphics;
+
+                        // Definisci un font simile a quello originale del PDF
+                        final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Cambia con il font desiderato
+
+                        // Imposta il colore e lo stile del testo (esempio: nero opaco)
+                        final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Colore nero
+
+                        // Scrivi il testo dinamico accanto al campo "NOMBRE"
+                        graphics.drawString(
+                          '${customersController.customer!.name}', // Testo dinamico
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(203, 131, 300, 20), // Posizionamento
+                        );
+
+                        // Salva il documento modificato
+                        final directory = await getExternalStorageDirectory();
+                        if (directory == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
+                          );
+                          return;
+                        }
+
+                        final String filePath = '${directory.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.pdf';
+                        final File file = File(filePath);
+                        await file.writeAsBytes(document.saveSync());
+
+                        // Chiudi il documento per rilasciare risorse
+                        document.dispose();
+
+                        // Mostra un messaggio di successo
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('PDF modificato e salvato in $filePath')),
+                        );
+                      } catch (e) {
+                        // Gestione degli errori
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
+                        );
+                      }
+                      //modifyPdfWithCustomFormatting(context);
+                    },
+                    icon: Icon(
+                      Icons.download,
+                      color: Colors.black, // Dark red color for the icon
+                      size: 28, // Increased icon size for better visibility
+                    ),
+                    label: Text(
+                      'PDF',
+                      style: TextStyle(
+                        color: Colors.black, // Dark red for the text
+                        fontSize: 18, // Larger font size for better readability
+                        fontWeight: FontWeight.bold, // Bold text for emphasis
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black, // Dark red color for the icon and text
+                      backgroundColor: Colors.white, // White background for the button
+                      padding: EdgeInsets.symmetric(vertical: 18), // Increased height for a better touch experience
+                      minimumSize: Size(double.infinity, 56), // Full width button with a fixed height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners for a smooth look
+                        side: BorderSide(color: Colors.black, width: 2), // Dark red border around the button
                       ),
                       elevation: 5, // Light shadow for the button
                       shadowColor: Colors.black45, // Shadow color for better visibility

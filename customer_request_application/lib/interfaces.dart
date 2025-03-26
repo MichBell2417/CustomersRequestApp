@@ -275,7 +275,7 @@ class Menu extends StatelessWidget{
             ),
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+        leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg", ),
       ),
 
       body: Stack(
@@ -423,7 +423,7 @@ class CustomerView extends StatelessWidget{
             ),
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+        leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg", ),
         
         /*actions: <Widget>[
           IconButton(
@@ -1054,7 +1054,7 @@ class BuenoDeHoras extends StatelessWidget {
             ),
           ),
         ),
-        leading: Image.asset("resources/image/DivermaticaLogo.jpg", ),
+        leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg", ),
         
         actions: <Widget>[
           IconButton(
