@@ -55,97 +55,40 @@ class AddEquipo extends StatelessWidget {
   );
 
   //Exporting the signature as png or jpeg (to put them in a pdf file?)
-  /*Future<void> _exportSignatureAsPNG() async {
+  Future<void> _exportSignatureAsPNG() async {
     try {
       // Get the signature image as a PNG
-      final signature = await controllerSAT.toImage();
-      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
+      var signature = await controllerSAT.toImage();
+      var byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      var bytes = byteData?.buffer.asUint8List();
 
       // Get the device's directory to save the file
-      final directory = await getExternalStorageDirectory();
-      final filePath = '${directory?.path}/signature.png';
+      var directory = await getApplicationDocumentsDirectory();
+      var filePath = '${directory.path}/signatureSAT_${numeroSerieController.text}.png';
 
       // Save the image as PNG
-      final file = File(filePath);
+      var file = File(filePath);
       await file.writeAsBytes(bytes as List<int>);
-    } catch (e) {
-      print("Error saving signature: $e");
-    }
 
-    try {
       // Get the signature image as a PNG
-      final signature = await controllerCustomers.toImage();
-      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
+      signature = await controllerCustomers.toImage();
+      byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
+      bytes = byteData?.buffer.asUint8List();
 
       // Get the device's directory to save the file
-      final directory = await getExternalStorageDirectory();
-      final filePath = '${directory?.path}/signature.png';
+      filePath = '${directory.path}/${customersController.customer!.dni}_${numeroSerieController.text}.png';
 
       // Save the image as PNG
-      final file = File(filePath);
+      file = File(filePath);
       await file.writeAsBytes(bytes as List<int>);
     
     } catch (e) {
       print("Error saving signature: $e");
     }
-  }*/
-
-  /*Future<void> _exportSignatureAsJPEG() async {
-    try {
-      // Get the signature image as PNG
-      final signature = await controllerSAT.toImage();
-      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
-
-      // Decode the PNG image into a usable format
-      img.Image? decodedImage = img.decodeImage(Uint8List.fromList(bytes as List<int>));
-
-      if (decodedImage != null) {
-        // Convert the image to JPEG
-        final jpegBytes = img.encodeJpg(decodedImage, quality: 85);
-
-        // Get the device's directory to save the JPEG
-        final directory = await getExternalStorageDirectory();
-        final filePath = '${directory?.path}/signatureSAT.jpg';
-        final file = File(filePath);
-
-        // Save the JPEG image
-        await file.writeAsBytes(jpegBytes);
-      }
-    } catch (e) {
-      print("Error saving signature as JPEG: $e");
-    }
-
-    try {
-      // Get the signature image as PNG
-      final signature = await controllerCustomers.toImage();
-      final byteData = await signature?.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
-
-      // Decode the PNG image into a usable format
-      img.Image? decodedImage = img.decodeImage(Uint8List.fromList(bytes as List<int>));
-
-      if (decodedImage != null) {
-        // Convert the image to JPEG
-        final jpegBytes = img.encodeJpg(decodedImage, quality: 85);
-
-        // Get the device's directory to save the JPEG
-        final directory = await getExternalStorageDirectory();
-        final filePath = '${directory?.path}/signatureCustomer.jpg';
-        final file = File(filePath);
-
-        // Save the JPEG image
-        await file.writeAsBytes(jpegBytes);
-      }
-    } catch (e) {
-      print("Error saving signature as JPEG: $e");
-    }
-  }*/
+  }
 
   Future<void> modifyPdfDirectly(BuildContext context) async {
-    try {
+    /*try {
       // Carica il file PDF esistente
       final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
       final Uint8List pdfData = bytes.buffer.asUint8List();
@@ -190,7 +133,7 @@ class AddEquipo extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
       );
-    }
+    }*/
 
     ///parte finale non relativa ai file
     Future.delayed(
@@ -760,6 +703,7 @@ class AddEquipo extends StatelessWidget {
                                         ),
                                       ),
                                       onPressed: () {
+                                        _exportSignatureAsPNG();
                                         modifyPdfDirectly(context);
 
                                         /*Navigator.of(context).pop();  // Close the dialog first

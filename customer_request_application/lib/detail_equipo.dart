@@ -27,60 +27,21 @@ final descriptionAccessoriosController = TextEditingController();
 class DetailEquipo extends StatelessWidget {
   const DetailEquipo({super.key});
 
-  /*Future<void> modifyPdfWithCustomFormatting(BuildContext context) async {
-    try {
-      // Carica il file PDF esistente
-      final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
-      final Uint8List pdfData = bytes.buffer.asUint8List();
+  // Draws a circle on the PDF
+  void drawCircle(PdfGraphics graphics, double x, double y, double diameter) {
+    // Draw an ellipse with equal width and height (creates a circle)
+    graphics.drawEllipse(
+      Rect.fromLTWH(
+        x, // X-coordinate for the top-left corner of the bounding rectangle
+        y, // Y-coordinate for the top-left corner of the bounding rectangle
+        diameter, // Width of the circle
+        diameter, // Height of the circle (same as width for a perfect circle)
+      ),
+      pen: PdfPen(PdfColor(0, 0, 0)), // Black color outline for the circle
+    );
+  }
 
-      // Apri il documento PDF
-      final PdfDocument document = PdfDocument(inputBytes: pdfData);
 
-      // Accedi alla prima pagina (o altre pagine se necessario)
-      final PdfPage page = document.pages[0];
-      final PdfGraphics graphics = page.graphics;
-
-      // Definisci un font simile a quello originale del PDF
-      final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Cambia con il font desiderato
-
-      // Imposta il colore e lo stile del testo (esempio: nero opaco)
-      final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Colore nero
-
-      // Scrivi il testo dinamico accanto al campo "NOMBRE"
-      graphics.drawString(
-        '${customersController.customer!.name}', // Testo dinamico
-        font,
-        brush: brush,
-        bounds: const Rect.fromLTWH(100, 50, 300, 20), // Posizionamento
-      );
-
-      // Salva il documento modificato
-      final directory = await getExternalStorageDirectory();
-      if (directory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
-        );
-        return;
-      }
-
-      final String filePath = '${directory.path}/modified_ResguardoDeposito.pdf';
-      final File file = File(filePath);
-      await file.writeAsBytes(document.saveSync());
-
-      // Chiudi il documento per rilasciare risorse
-      document.dispose();
-
-      // Mostra un messaggio di successo
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('PDF modificato e salvato in $filePath')),
-      );
-    } catch (e) {
-      // Gestione degli errori
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
-      );
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -986,37 +947,180 @@ class DetailEquipo extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Add horizontal padding to distance from the sides
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                        try {
-                        // Carica il file PDF esistente
+                      try {
+                        // Load the existing PDF file
                         final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
                         final Uint8List pdfData = bytes.buffer.asUint8List();
 
-                        // Apri il documento PDF
+                        // Open the PDF document
                         final PdfDocument document = PdfDocument(inputBytes: pdfData);
 
-                        // Accedi alla prima pagina (o altre pagine se necessario)
+                        // Access the first page (or other pages as needed)
                         final PdfPage page = document.pages[0];
                         final PdfGraphics graphics = page.graphics;
 
-                        // Definisci un font simile a quello originale del PDF
-                        final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Cambia con il font desiderato
+                        // Define a font similar to the original one in the PDF
+                        final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Change to the desired font
 
-                        // Imposta il colore e lo stile del testo (esempio: nero opaco)
-                        final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Colore nero
+                        // Set the color and style of the text (example: solid black)
+                        final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Black color
 
-                        // Scrivi il testo dinamico accanto al campo "NOMBRE"
                         graphics.drawString(
-                          '${customersController.customer!.name}', // Testo dinamico
+                          '${customersController.equipo!.id}', // Dynamic text
                           font,
                           brush: brush,
-                          bounds: const Rect.fromLTWH(203, 131, 300, 20), // Posizionamento
+                          bounds: const Rect.fromLTWH(476, 84, 300, 20), // Positioning
                         );
 
-                        // Salva il documento modificato
+                        //CUSTOMER INFORMATION
+                        graphics.drawString(
+                          '${customersController.customer!.name}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(203, 132, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.customer!.street}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(207, 146, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.customer!.cp}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(180, 160, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.customer!.dni}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(185, 188, 300, 20), // Positioning
+                        );
+                        
+                        graphics.drawString(
+                          '${customersController.customer!.phoneNumber}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(310, 188, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.customer!.eMail}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(190, 202, 300, 20), // Positioning
+                        );
+                        
+                        //EQUIPO INFORMATION
+                        graphics.drawString(
+                          '${customersController.equipo!.tipo}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(183, 276, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.marca}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(189, 290, 300, 20), // Positioning
+                        );
+
+                        customersController.equipo!.garantia == 1 ? 
+                          drawCircle(graphics, 371, 292, 11) : drawCircle(graphics, 420, 292, 11);
+
+                        graphics.drawString(
+                          '${customersController.equipo!.modelo}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(195, 304, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.numeroSerie}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(230, 318, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.descripcionAccesorios}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(206, 332, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.descripcion}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(120, 400, 300, 20), // Positioning
+                        );
+
+                        // Ottieni il percorso della directory dei documenti
+                        final directorySignature = await getApplicationDocumentsDirectory();
+
+                        //SignatureSAT
+                        final String filePathSignatureSAT = '${directorySignature.path}/signatureSAT_${customersController.equipo!.numeroSerie}.png';
+
+                        // Controlla se il file esiste
+                        final File signatureSAT = File(filePathSignatureSAT);
+
+                        // Check if the signature file exists
+                        if (await signatureSAT.exists()) {
+                          // Read the signature file as bytes
+                          final Uint8List signatureData = await signatureSAT.readAsBytes();
+
+                          // Create a PdfBitmap from the signature bytes
+                          final PdfBitmap signatureImage = PdfBitmap(signatureData);
+
+                          // Draw the signature on the page
+                          graphics.drawImage(
+                            signatureImage,
+                            const Rect.fromLTWH(117, 710, 50, 40), // Position and size of the signature
+                          );
+                        } else {
+                          // ignore: avoid_print
+                          print('${directorySignature.path}/signatureSAT_${customersController.equipo!.numeroSerie}.png');
+                          // ignore: avoid_print
+                          print("The signature file does not exist");
+                        }
+
+                        //Signature Customer
+                        final String filePathSignatureCustomer = '${directorySignature.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.png';
+
+                        // Controlla se il file esiste
+                        final File signatureCustomer = File(filePathSignatureCustomer);
+
+                        // Check if the signature file exists
+                        if (await signatureCustomer.exists()) {
+                          // Read the signature file as bytes
+                          final Uint8List signatureData = await signatureCustomer.readAsBytes();
+
+                          // Create a PdfBitmap from the signature bytes
+                          final PdfBitmap signatureImage = PdfBitmap(signatureData);
+
+                          // Draw the signature on the page
+                          graphics.drawImage(
+                            signatureImage,
+                            const Rect.fromLTWH(230, 710, 50, 40), // Position and size of the signature
+                          );
+                        } else {
+                          // ignore: avoid_print
+                          print('${directorySignature.path}/${directorySignature.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.png');
+                          // ignore: avoid_print
+                          print("The signature file does not exist");
+                        }
+
+                        // Save the modified document
                         final directory = await getExternalStorageDirectory();
                         if (directory == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
+                            const SnackBar(content: Text('Unable to access the external directory!')),
                           );
                           return;
                         }
@@ -1025,17 +1129,17 @@ class DetailEquipo extends StatelessWidget {
                         final File file = File(filePath);
                         await file.writeAsBytes(document.saveSync());
 
-                        // Chiudi il documento per rilasciare risorse
+                        // Close the document to release resources
                         document.dispose();
 
-                        // Mostra un messaggio di successo
+                        // Show a success message
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('PDF modificato e salvato in $filePath')),
+                          SnackBar(content: Text('PDF modified and saved in $filePath')),
                         );
                       } catch (e) {
-                        // Gestione degli errori
+                        // Error handling
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
+                          SnackBar(content: Text('Error while editing the PDF: $e')),
                         );
                       }
                       //modifyPdfWithCustomFormatting(context);
