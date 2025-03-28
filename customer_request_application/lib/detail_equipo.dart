@@ -994,6 +994,15 @@ class DetailEquipo extends StatelessWidget {
                           bounds: const Rect.fromLTWH(180, 160, 300, 20), // Positioning
                         );
 
+
+                        Map<String, String>? location = await customersController.customer!.getCityAndProvince(customersController.customer!.cp); // Codice postale di Jerez de la Frontera
+                        if (location != null) {
+                          print('Città: ${location['city']}, Provincia: ${location['province']}');
+                        } else {
+                          print('Impossibile trovare la città e la provincia.');
+                        }
+                        
+
                         graphics.drawString(
                           '${customersController.customer!.dni}', // Dynamic text
                           font,
@@ -1024,6 +1033,27 @@ class DetailEquipo extends StatelessWidget {
                         );
 
                         graphics.drawString(
+                          '${customersController.equipo!.fechaSolicitud.day}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(397, 276, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.fechaSolicitud.month}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(419, 276, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
+                          '${customersController.equipo!.fechaSolicitud.year}', // Dynamic text
+                          font,
+                          brush: brush,
+                          bounds: const Rect.fromLTWH(437, 276, 300, 20), // Positioning
+                        );
+
+                        graphics.drawString(
                           '${customersController.equipo!.marca}', // Dynamic text
                           font,
                           brush: brush,
@@ -1031,7 +1061,7 @@ class DetailEquipo extends StatelessWidget {
                         );
 
                         customersController.equipo!.garantia == 1 ? 
-                          drawCircle(graphics, 371, 292, 11) : drawCircle(graphics, 420, 292, 11);
+                          drawCircle(graphics, 371, 292, 11) : drawCircle(graphics, 405, 292, 11);
 
                         graphics.drawString(
                           '${customersController.equipo!.modelo}', // Dynamic text
@@ -1105,10 +1135,15 @@ class DetailEquipo extends StatelessWidget {
                           final PdfBitmap signatureImage = PdfBitmap(signatureData);
 
                           // Draw the signature on the page
-                          graphics.drawImage(
-                            signatureImage,
-                            const Rect.fromLTWH(230, 710, 50, 40), // Position and size of the signature
-                          );
+                          customersController.equipo!.sinPresupuesto == false ?
+                            graphics.drawImage(
+                              signatureImage,
+                              const Rect.fromLTWH(230, 710, 50, 40), // Con presupuesto
+                            ) : 
+                            graphics.drawImage(
+                              signatureImage,
+                              const Rect.fromLTWH(410, 710, 50, 40), // Sin presupuesto
+                            );
                         } else {
                           // ignore: avoid_print
                           print('${directorySignature.path}/${directorySignature.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.png');
@@ -1142,7 +1177,6 @@ class DetailEquipo extends StatelessWidget {
                           SnackBar(content: Text('Error while editing the PDF: $e')),
                         );
                       }
-                      //modifyPdfWithCustomFormatting(context);
                     },
                     icon: Icon(
                       Icons.download,

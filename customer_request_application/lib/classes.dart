@@ -2,20 +2,24 @@ import 'dart:async';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Equipo {
   int _id;
   String _tipo;
   String _marca;
   String _modello;
-  String _numeroDiSerie; //Where the customer live
-  int _garantia; //The type of contract the customers bougth
-  String _descripcionAccesorios; //Remaining contract time for the customer
+  String _numeroDiSerie;
+  DateTime _fechaSolicitud;
+  int _garantia;
+  int _sinPresupuesto;
+  String _descripcionAccesorios;
   String _descripcion;
   int _idCliente;
-
+  
   //BUILDER
-  Equipo(this._id, this._tipo, this._marca, this._modello, this._numeroDiSerie,this._garantia, this._descripcionAccesorios, this._descripcion, this._idCliente);
+  Equipo(this._id, this._tipo, this._marca, this._modello, this._numeroDiSerie, this._fechaSolicitud, this._garantia, this._sinPresupuesto, this._descripcionAccesorios, this._descripcion, this._idCliente);
   
   //SETTER
   void setId(int id) {
@@ -38,6 +42,10 @@ class Equipo {
     _numeroDiSerie = numeroDiSerie;
   }
 
+  void setFechaSolicitud(DateTime fechaSolicitud) {
+    _fechaSolicitud = fechaSolicitud;
+  }
+
   void setGarantia(int garantia) {
     _garantia = garantia;
   }
@@ -54,6 +62,10 @@ class Equipo {
     _idCliente = idCliente;
   }
 
+  void setSinPresupuesto(int sinPresupuesto) {
+    _sinPresupuesto = sinPresupuesto;
+  }
+
 
   //GETTER
   get id => _id;
@@ -65,6 +77,8 @@ class Equipo {
   get descripcionAccesorios => _descripcionAccesorios;
   get descripcion => _descripcion;
   get idCliente => _idCliente;
+  get sinPresupuesto => _sinPresupuesto;
+  get fechaSolicitud => _fechaSolicitud;
 }
 
 
@@ -131,6 +145,27 @@ class Customer {
   String remainingContractTimeStr() {
     return ApplicationController.timeInString(
         _remainingContractTime.hour, _remainingContractTime.minute);
+  }
+
+
+  Future<Map<String, String>?> getCityAndProvince(String postalCode) async {
+    const String username = 'TUO_USERNAME_GEONAMES'; // Inserisci il tuo username di GeoNames
+    final String baseUrl =
+        'http://api.geonames.org/postalCodeLookupJSON?postalcode=$postalCode&country=ES&username=$username';
+
+    final response = await http.get(Uri.parse(baseUrl));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['postalcodes'] != null && data['postalcodes'].isNotEmpty) {
+        final city = data['postalcodes'][0]['placeName']; // Nome della città
+        final province = data['postalcodes'][0]['adminName1']; // Nome della provincia
+        return {'city': city, 'province': province};
+      }
+    } else {
+      print('Errore: ${response.statusCode}');
+    }
+    return null;
   }
   
   @override
@@ -416,10 +451,12 @@ class ApplicationController extends ChangeNotifier {
               equiposLocal['marca'],
               equiposLocal['modelo'],
               equiposLocal['numeroSerie'],
+              equiposLocal['fechaSolicitud'],
               equiposLocal['garantia'],
+              equiposLocal['sinPresupuesto'],
               equiposLocal['descripcionAccesorios'],
               equiposLocal['descripcion'],
-              equiposLocal['id_cliente'],
+              equiposLocal['id_cliente']
             )
           );
         }
@@ -432,13 +469,15 @@ class ApplicationController extends ChangeNotifier {
 
 
   //Adds a device to the database
-  Future<bool> addDevice(String tipo, String marca, String modelo, String numeroSerie, String descripcion, String descripcionAccesorios,) async {
+  Future<bool> addDevice(String tipo, String marca, String modelo, String numeroSerie, String descripcion, String descripcionAccesorios, int sinPresupuesto, DateTime fechaSolicitud) async {
     try {
       // Insert the new equipo into the database
       await database!.query(
-        "INSERT INTO equipos (tipo, marca, modelo, numeroSerie, garantia, descripcionAccesorios, descripcion, id_cliente) "
-        "VALUES ('$tipo', '$marca', '$modelo', '$numeroSerie', '$isInGarantia', '$descripcionAccesorios', '$descripcion', '${customer!.id}');"
+        "INSERT INTO equipos (tipo, marca, modelo, numeroSerie, fechaSolicitud, garantia, sinPresupuesto, descripcionAccesorios, descripcion, id_cliente)"
+        "VALUES ('$tipo', '$marca', '$modelo', '$numeroSerie', '$fechaSolicitud', '$isInGarantia', '$sinPresupuesto', '$descripcionAccesorios', '$descripcion', '${customer!.id}');"
       );
+
+      pullDevicesOfCustomer(customer!.id);
       
       notifyListeners();
       return true;
@@ -487,6 +526,37 @@ class ApplicationController extends ChangeNotifier {
       // In case of an error, show an alert and return false
       alert(classContext!, "Error", "Error while trying to upgrade.");
       return false; // Error
+    }
+  }
+
+  Future<void> findDeviceFromNumeroSerie(String numeroSerie) async {
+    try {
+      final Results results = await database!.query(
+        "SELECT * FROM equipos WHERE numeroSerie = ?",
+        [numeroSerie], // To avoid SQL injection
+      );
+
+      if (results.isNotEmpty) {
+        equipo = Equipo(
+          results.toList().first['id'], 
+          results.toList().first['tipo'], 
+          results.toList().first['marca'], 
+          results.toList().first['modelo'], 
+          results.toList().first['numeroSerie'],
+          results.toList().first['fechaSolicitud'], 
+          results.toList().first['garantia'],
+          results.toList().first['sinPresupuesto'], 
+          results.toList().first['descripcionAccesorios'], 
+          results.toList().first['descripcion'], 
+          results.toList().first['id_cliente']
+
+        );
+      }else{
+        alert(classContext!, "error", "This device does not exist.");
+
+      }
+    } catch (e) {
+      alert(classContext!, "error", "The database gives error: $e");
     }
   }
 

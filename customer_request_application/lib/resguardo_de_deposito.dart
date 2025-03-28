@@ -387,7 +387,7 @@ class ResguardoDeDeposito extends StatelessWidget{
         ),
         leading: Image.asset("assets/resources/image/DivermaticaLogo.jpg", ),
         
-        actions: <Widget>[
+        /*actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.people,size: 20),
             onPressed: () {
@@ -402,7 +402,7 @@ class ResguardoDeDeposito extends StatelessWidget{
               );
             },
           ),
-        ]
+        ]*/
       ),
       
       body:
@@ -421,223 +421,234 @@ class ResguardoDeDeposito extends StatelessWidget{
               ),
             ),
             // Card displaying contract type and remaining hours
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16), // Padding around the entire content
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
-                    children: [
-                      // First row - "Nombre contrato" and "Horas restantes"
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Nombre:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.name,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "E-Mail:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.eMail, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      // Spacer between two rows
-                      SizedBox(height: 16),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Numero Telefonico:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.phoneNumber,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "D.N.I:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.dni, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      SizedBox(height: 16),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Direccion:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.street,
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "C.P.:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.cp, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      // Spacer between two rows
-                      SizedBox(height: 16),
-
-                      // Last row - Similar structure to the first row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Nombre contrato:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.contractType.name, // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 10),
-                                Text(
-                                  "Horas restantes:",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                                  softWrap: true, // Allow text to wrap
-                                ),
-                                SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    customersController.customer!.remainingContractTimeStr(), // This can be dynamic and longer if needed
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
-                                    overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                                    softWrap: true, // Allow text to wrap
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+            GestureDetector(
+              onTap: () {
+                customersController.customer = null;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResguardoDeDeposito(),
                   ),
-                )
+                );
+              },
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Colors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color.fromARGB(172, 0, 0, 0), width: 1), // black border
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16), // Padding around the entire content
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start, // Aligning text to the start
+                      children: [
+                        // First row - "Nombre contrato" and "Horas restantes"
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Nombre:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.name,
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "E-Mail:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.eMail, // This can be dynamic and longer if needed
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        // Spacer between two rows
+                        SizedBox(height: 16),
 
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Numero Telefonico:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.phoneNumber,
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "D.N.I:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.dni, // This can be dynamic and longer if needed
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        SizedBox(height: 16),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Direccion:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.street,
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "C.P.:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.cp, // This can be dynamic and longer if needed
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        // Spacer between two rows
+                        SizedBox(height: 16),
+
+                        // Last row - Similar structure to the first row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Nombre contrato:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 33, 82, 243)),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.contractType.name, // This can be dynamic and longer if needed
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Horas restantes:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                    softWrap: true, // Allow text to wrap
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      customersController.customer!.remainingContractTimeStr(), // This can be dynamic and longer if needed
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
+                                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                                      softWrap: true, // Allow text to wrap
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ),
               ),
             ),
+
 
             FutureBuilder<List<Equipo?>?>(
               future: customersController.pullDevicesOfCustomer(customersController.customer!.id),

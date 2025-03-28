@@ -18,7 +18,6 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 ///SIGNATURE TO IMAGE LIBRARY
 import 'dart:typed_data';
-import 'package:image/image.dart' as img; // For image manipulation
 import 'dart:ui' as ui;  // Import dart:ui to work with images
 
 
@@ -34,13 +33,16 @@ final modeloController = TextEditingController();
 final numeroSerieController = TextEditingController();
 final descriptionAccessoriosController = TextEditingController();
 
-///-------------------------------- class with the interface to manage the hours
+
 enum SingingCharacter { si, no }
 
 // ignore: must_be_immutable
 class AddEquipo extends StatelessWidget {
   AddEquipo({super.key});
   ValueNotifier<SingingCharacter?> radioButtonSelectionNotifier = ValueNotifier<SingingCharacter?>(null);
+  ValueNotifier<SingingCharacter?> radioButtonSelectionNotifierPres = ValueNotifier<SingingCharacter?>(null);
+
+  int sinPresupuesto = 0;
   
   final SignatureController controllerSAT = SignatureController(
     penStrokeWidth: 1,
@@ -54,8 +56,21 @@ class AddEquipo extends StatelessWidget {
     exportBackgroundColor: Colors.transparent,
   );
 
+  void drawCircle(PdfGraphics graphics, double x, double y, double diameter) {
+    // Draw an ellipse with equal width and height (creates a circle)
+    graphics.drawEllipse(
+      Rect.fromLTWH(
+        x, // X-coordinate for the top-left corner of the bounding rectangle
+        y, // Y-coordinate for the top-left corner of the bounding rectangle
+        diameter, // Width of the circle
+        diameter, // Height of the circle (same as width for a perfect circle)
+      ),
+      pen: PdfPen(PdfColor(0, 0, 0)), // Black color outline for the circle
+    );
+  }
+
   //Exporting the signature as png or jpeg (to put them in a pdf file?)
-  Future<void> _exportSignatureAsPNG() async {
+  Future<void> _exportSignatureAsPNG(BuildContext context) async {
     try {
       // Get the signature image as a PNG
       var signature = await controllerSAT.toImage();
@@ -83,36 +98,237 @@ class AddEquipo extends StatelessWidget {
       await file.writeAsBytes(bytes as List<int>);
     
     } catch (e) {
-      print("Error saving signature: $e");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(
+                "An error occurred while saving the signature. Please check your input and try again."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
   Future<void> modifyPdfDirectly(BuildContext context) async {
-    /*try {
-      // Carica il file PDF esistente
+    try {
+      // Load the existing PDF file
       final ByteData bytes = await rootBundle.load('assets/resources/Documents/ResguardoDeposito.pdf');
       final Uint8List pdfData = bytes.buffer.asUint8List();
 
-      // Apri il documento PDF
+      // Open the PDF document
       final PdfDocument document = PdfDocument(inputBytes: pdfData);
 
-      // Accedi alla prima pagina (o altre pagine se necessario)
+      // Access the first page (or other pages as needed)
       final PdfPage page = document.pages[0];
       final PdfGraphics graphics = page.graphics;
 
-      // Aggiungi testo dinamico accanto al campo "NOMBRE"
-      final PdfFont font = PdfStandardFont(PdfFontFamily.helvetica, 14);
+      // Define a font similar to the original one in the PDF
+      final PdfFont font = PdfStandardFont(PdfFontFamily.timesRoman, 12); // Change to the desired font
+
+      // Set the color and style of the text (example: solid black)
+      final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0)); // Black color
+
       graphics.drawString(
-        '${customersController.customer!.name}', // Testo dinamico
+        '${customersController.equipo!.id}', // Dynamic text
         font,
-        bounds: const Rect.fromLTWH(200, 150, 300, 20), // Posizionamento del testo (coordina qui manualmente)
+        brush: brush,
+        bounds: const Rect.fromLTWH(476, 84, 300, 20), // Positioning
       );
 
-      // Salva il documento modificato
+      //CUSTOMER INFORMATION
+      graphics.drawString(
+        '${customersController.customer!.name}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(203, 132, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.customer!.street}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(207, 146, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.customer!.cp}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(180, 160, 300, 20), // Positioning
+      );
+
+
+      Map<String, String>? location = await customersController.customer!.getCityAndProvince(customersController.customer!.cp); // Codice postale di Jerez de la Frontera
+      if (location != null) {
+        print('Città: ${location['city']}, Provincia: ${location['province']}');
+      } else {
+        print('Impossibile trovare la città e la provincia.');
+      }
+      
+
+      graphics.drawString(
+        '${customersController.customer!.dni}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(185, 188, 300, 20), // Positioning
+      );
+      
+      graphics.drawString(
+        '${customersController.customer!.phoneNumber}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(310, 188, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.customer!.eMail}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(190, 202, 300, 20), // Positioning
+      );
+      
+      //EQUIPO INFORMATION
+      graphics.drawString(
+        '${customersController.equipo!.tipo}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(183, 276, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.fechaSolicitud.day}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(397, 276, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.fechaSolicitud.month}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(419, 276, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.fechaSolicitud.year}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(437, 276, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.marca}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(189, 290, 300, 20), // Positioning
+      );
+
+      customersController.equipo!.garantia == 1 ? 
+        drawCircle(graphics, 371, 292, 11) : drawCircle(graphics, 405, 292, 11);
+
+      graphics.drawString(
+        '${customersController.equipo!.modelo}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(195, 304, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.numeroSerie}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(230, 318, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.descripcionAccesorios}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(206, 332, 300, 20), // Positioning
+      );
+
+      graphics.drawString(
+        '${customersController.equipo!.descripcion}', // Dynamic text
+        font,
+        brush: brush,
+        bounds: const Rect.fromLTWH(120, 400, 300, 20), // Positioning
+      );
+
+      // Ottieni il percorso della directory dei documenti
+      final directorySignature = await getApplicationDocumentsDirectory();
+
+      //SignatureSAT
+      final String filePathSignatureSAT = '${directorySignature.path}/signatureSAT_${customersController.equipo!.numeroSerie}.png';
+
+      // Controlla se il file esiste
+      final File signatureSAT = File(filePathSignatureSAT);
+
+      // Check if the signature file exists
+      if (await signatureSAT.exists()) {
+        // Read the signature file as bytes
+        final Uint8List signatureData = await signatureSAT.readAsBytes();
+
+        // Create a PdfBitmap from the signature bytes
+        final PdfBitmap signatureImage = PdfBitmap(signatureData);
+
+        // Draw the signature on the page
+        graphics.drawImage(
+          signatureImage,
+          const Rect.fromLTWH(117, 710, 50, 40), // Position and size of the signature
+        );
+      } else {
+        // ignore: avoid_print
+        print('${directorySignature.path}/signatureSAT_${customersController.equipo!.numeroSerie}.png');
+        // ignore: avoid_print
+        print("The signature file does not exist");
+      }
+
+      //Signature Customer
+      final String filePathSignatureCustomer = '${directorySignature.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.png';
+
+      // Controlla se il file esiste
+      final File signatureCustomer = File(filePathSignatureCustomer);
+
+      // Check if the signature file exists
+      if (await signatureCustomer.exists()) {
+        // Read the signature file as bytes
+        final Uint8List signatureData = await signatureCustomer.readAsBytes();
+
+        // Create a PdfBitmap from the signature bytes
+        final PdfBitmap signatureImage = PdfBitmap(signatureData);
+
+        // Draw the signature on the page
+        sinPresupuesto == 0 ?
+          graphics.drawImage(
+            signatureImage,
+            const Rect.fromLTWH(230, 710, 50, 40), // Con presupuesto
+          ) : 
+          graphics.drawImage(
+            signatureImage,
+            const Rect.fromLTWH(410, 710, 50, 40), // Sin presupuesto
+          );
+      } else {
+        // ignore: avoid_print
+        print('${directorySignature.path}/${directorySignature.path}/${customersController.customer!.dni}_${customersController.equipo!.numeroSerie}.png');
+        // ignore: avoid_print
+        print("The signature file does not exist");
+      }
+
+      // Save the modified document
       final directory = await getExternalStorageDirectory();
       if (directory == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossibile accedere alla directory esterna!')),
+          const SnackBar(content: Text('Unable to access the external directory!')),
         );
         return;
       }
@@ -121,21 +337,22 @@ class AddEquipo extends StatelessWidget {
       final File file = File(filePath);
       await file.writeAsBytes(document.saveSync());
 
-      // Chiudi il documento per rilasciare risorse
+      // Close the document to release resources
       document.dispose();
 
-      // Mostra un messaggio di successo
+      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('PDF modificato e salvato in $filePath')),
+        SnackBar(content: Text('PDF modified and saved in $filePath')),
       );
     } catch (e) {
-      // Gestione degli errori
+      // Error handling
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante la modifica del PDF: $e')),
+        SnackBar(content: Text('Error while editing the PDF: $e')),
       );
-    }*/
+      customersController.findDeviceFromNumeroSerie(numeroSerieController.text);
+      customersController.deleteDevice(customersController.equipo!.id);
+    }
 
-    ///parte finale non relativa ai file
     Future.delayed(
       Duration(seconds: 2), () {      
         Navigator.of(context).pop();
@@ -486,8 +703,7 @@ class AddEquipo extends StatelessWidget {
                   ],
                 ),
               ),
-
-
+              
               SizedBox(height: 16),
 
               // Description input field
@@ -526,6 +742,75 @@ class AddEquipo extends StatelessWidget {
                   ),
                 ),
               ),
+
+              SizedBox(height: 16),
+
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Presupuesto",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Card(
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      color: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 1), // Bordo nero sottile
+                          borderRadius: BorderRadius.circular(12), // Stessa curvatura del Card
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: ValueListenableBuilder<SingingCharacter?>(
+                            valueListenable: radioButtonSelectionNotifierPres,
+                            builder: (context, selectedValuePres, _) {
+                              return Column(
+                                children: [
+                                  RadioListTile<SingingCharacter>(
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.check, color: const Color.fromARGB(206, 0, 105, 4), size: 20),
+                                        SizedBox(width: 10),
+                                        Text("Si", style: TextStyle(fontSize: 16)),
+                                      ],
+                                    ),
+                                    value: SingingCharacter.si,
+                                    groupValue: selectedValuePres,
+                                    onChanged: (SingingCharacter? value) {
+                                      sinPresupuesto = 0;
+                                      radioButtonSelectionNotifierPres.value = value;
+                                    },
+                                  ),
+                                  RadioListTile<SingingCharacter>(
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.close, color: const Color.fromARGB(255, 175, 12, 0), size: 20),
+                                        SizedBox(width: 10),
+                                        Text("No", style: TextStyle(fontSize: 16)),
+                                      ],
+                                    ),
+                                    value: SingingCharacter.no,
+                                    groupValue: selectedValuePres,
+                                    onChanged: (SingingCharacter? value) {
+                                      sinPresupuesto = 1;
+                                      radioButtonSelectionNotifierPres.value = value;
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               SizedBox(height: 16),
 
               // Signature section
@@ -673,6 +958,8 @@ class AddEquipo extends StatelessWidget {
                               numeroSerieController.text,
                               descriptionController.text,
                               descriptionAccessoriosController.text,
+                              sinPresupuesto,
+                              DateTime.now()
                             );
                             
                             // Show confirmation alert
@@ -703,20 +990,13 @@ class AddEquipo extends StatelessWidget {
                                         ),
                                       ),
                                       onPressed: () {
-                                        _exportSignatureAsPNG();
-                                        modifyPdfDirectly(context);
-
-                                        /*Navigator.of(context).pop();  // Close the dialog first
-
-                                        // Now navigate to ResguardoDeDeposito
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return ResguardoDeDeposito();
-                                            },
-                                          )
-                                        );*/
+                                        customersController.findDeviceFromNumeroSerie(numeroSerieController.text);
+                                        _exportSignatureAsPNG(context);
+                                        Future.delayed(
+                                          Duration(seconds: 2), () {
+                                            modifyPdfDirectly(context);
+                                          }
+                                        );
                                       },
                                     ),
                                   ],
