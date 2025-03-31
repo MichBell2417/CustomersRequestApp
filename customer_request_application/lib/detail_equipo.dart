@@ -995,12 +995,12 @@ class DetailEquipo extends StatelessWidget {
                         );
 
 
-                        Map<String, String>? location = await customersController.customer!.getCityAndProvince(customersController.customer!.cp); // Codice postale di Jerez de la Frontera
+                        /*Map<String, String>? location = await customersController.customer!.getCityAndProvince(customersController.customer!.cp); // Codice postale di Jerez de la Frontera
                         if (location != null) {
                           print('Città: ${location['city']}, Provincia: ${location['province']}');
                         } else {
                           print('Impossibile trovare la città e la provincia.');
-                        }
+                        }*/
                         
 
                         graphics.drawString(
@@ -1068,6 +1068,11 @@ class DetailEquipo extends StatelessWidget {
                           font,
                           brush: brush,
                           bounds: const Rect.fromLTWH(195, 304, 300, 20), // Positioning
+                        );
+
+                        page.graphics.drawRectangle(
+                          brush: PdfSolidBrush(PdfColor(255, 255, 255)),
+                          bounds: Rect.fromLTWH(297, 304, 150, 50),
                         );
 
                         graphics.drawString(

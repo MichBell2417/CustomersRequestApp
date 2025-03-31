@@ -149,7 +149,7 @@ class Customer {
 
 
   Future<Map<String, String>?> getCityAndProvince(String postalCode) async {
-    const String username = 'TUO_USERNAME_GEONAMES'; // Inserisci il tuo username di GeoNames
+    const String username = 'divermatica';  //email: satdivermatica@gmail.com password: T3cn1c0@2025 for logging in geonames
     final String baseUrl =
         'http://api.geonames.org/postalCodeLookupJSON?postalcode=$postalCode&country=ES&username=$username';
 
@@ -158,8 +158,8 @@ class Customer {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['postalcodes'] != null && data['postalcodes'].isNotEmpty) {
-        final city = data['postalcodes'][0]['placeName']; // Nome della città
-        final province = data['postalcodes'][0]['adminName1']; // Nome della provincia
+        final city = data['postalcodes'][0]['placeName'];
+        final province = data['postalcodes'][0]['adminName1'];
         return {'city': city, 'province': province};
       }
     } else {

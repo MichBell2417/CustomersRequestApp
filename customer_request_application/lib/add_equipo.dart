@@ -36,6 +36,15 @@ final descriptionAccessoriosController = TextEditingController();
 
 enum SingingCharacter { si, no }
 
+void cleanTextField(){
+  tipoController.text = "";
+  descriptionController.text = "";
+  descriptionAccessoriosController.text = "";
+  marcaController.text = "";
+  modeloController.text = "";
+  numeroSerieController.text = "";
+}
+
 // ignore: must_be_immutable
 class AddEquipo extends StatelessWidget {
   AddEquipo({super.key});
@@ -170,7 +179,19 @@ class AddEquipo extends StatelessWidget {
 
       Map<String, String>? location = await customersController.customer!.getCityAndProvince(customersController.customer!.cp); // Codice postale di Jerez de la Frontera
       if (location != null) {
-        print('Città: ${location['city']}, Provincia: ${location['province']}');
+        graphics.drawString(
+          '${location['city']}', // Dynamic text
+          font,
+          brush: brush,
+          bounds: const Rect.fromLTWH(300, 160, 300, 20), // Positioning
+        );
+
+        graphics.drawString(
+          '${location['province']}', // Dynamic text
+          font,
+          brush: brush,
+          bounds: const Rect.fromLTWH(207, 174, 300, 20), // Positioning
+        );
       } else {
         print('Impossibile trovare la città e la provincia.');
       }
@@ -241,6 +262,11 @@ class AddEquipo extends StatelessWidget {
         font,
         brush: brush,
         bounds: const Rect.fromLTWH(195, 304, 300, 20), // Positioning
+      );
+
+      page.graphics.drawRectangle(
+        brush: PdfSolidBrush(PdfColor(255, 255, 255)),
+        bounds: Rect.fromLTWH(297, 304, 150, 50),
       );
 
       graphics.drawString(
@@ -423,6 +449,7 @@ class AddEquipo extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios,size: 20),
             onPressed: () {
+              cleanTextField();
               Navigator.push(
                 context, 
                 MaterialPageRoute(
@@ -992,6 +1019,7 @@ class AddEquipo extends StatelessWidget {
                                       onPressed: () {
                                         customersController.findDeviceFromNumeroSerie(numeroSerieController.text);
                                         _exportSignatureAsPNG(context);
+                                        cleanTextField();
                                         Future.delayed(
                                           Duration(seconds: 2), () {
                                             modifyPdfDirectly(context);
